@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Huang, Bo, Python" />
+  <meta name="keywords" content=",," />
 
 
 
@@ -79,17 +79,18 @@
 
 
 
-<meta name="description" content="Python">
+<meta name="description" content="目前前后端联调方式1、编译之后联调-痛苦的二十分钟 2、把js、css上传storage联调，但是这种方式常常有jquery无法引入的问题。并且也有编译上传storage的流程复杂问题。 加速方案-欺骗法1、前端Grunt服务绑定80端口，sudo启动服务 2、配置Grunt代理，api请求到服务器 3、配置www.xuetangx.com hosts到api服务地址例如192.168.9.242">
+<meta name="keywords" content="Django,CORS">
 <meta property="og:type" content="website">
-<meta property="og:title" content="tags">
-<meta property="og:url" content="http://yoursite.com/tags/index.html">
+<meta property="og:title" content="Django 前后端联调过程优化">
+<meta property="og:url" content="http://yoursite.com/blog/technical/Django 前后端联调优化.html">
 <meta property="og:site_name" content="Big Man`s Posts">
-<meta property="og:description" content="Python">
+<meta property="og:description" content="目前前后端联调方式1、编译之后联调-痛苦的二十分钟 2、把js、css上传storage联调，但是这种方式常常有jquery无法引入的问题。并且也有编译上传storage的流程复杂问题。 加速方案-欺骗法1、前端Grunt服务绑定80端口，sudo启动服务 2、配置Grunt代理，api请求到服务器 3、配置www.xuetangx.com hosts到api服务地址例如192.168.9.242">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-01-12T06:45:41.884Z">
+<meta property="og:updated_time" content="2018-01-14T15:20:59.778Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="tags">
-<meta name="twitter:description" content="Python">
+<meta name="twitter:title" content="Django 前后端联调过程优化">
+<meta name="twitter:description" content="目前前后端联调方式1、编译之后联调-痛苦的二十分钟 2、把js、css上传storage联调，但是这种方式常常有jquery无法引入的问题。并且也有编译上传storage的流程复杂问题。 加速方案-欺骗法1、前端Grunt服务绑定80端口，sudo启动服务 2、配置Grunt代理，api请求到服务器 3、配置www.xuetangx.com hosts到api服务地址例如192.168.9.242">
 
 
 
@@ -119,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/tags/"/>
+  <link rel="canonical" href="http://yoursite.com/blog/technical/Django 前后端联调优化.html"/>
 
 
 
 
 
-  <title>tags | Big Man`s Posts</title>
+  <title>Django 前后端联调过程优化 | Big Man`s Posts</title>
   
 
 
@@ -235,7 +236,7 @@
     <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline">tags</h1>
+	<h1 class="post-title" itemprop="name headline">Django 前后端联调过程优化</h1>
 
 
 
@@ -247,14 +248,22 @@
       <div class="post-body">
         
         
-          <div class="tag-cloud">
-            <div class="tag-cloud-title">
-                5 tags in total
-            </div>
-            <div class="tag-cloud-tags">
-              <a href="/tags/CORS/" style="font-size: 12px; color: #ccc">CORS</a> <a href="/tags/Django/" style="font-size: 30px; color: #111">Django</a> <a href="/tags/Mysql/" style="font-size: 12px; color: #ccc">Mysql</a> <a href="/tags/Redis/" style="font-size: 12px; color: #ccc">Redis</a> <a href="/tags/ngrok/" style="font-size: 12px; color: #ccc">ngrok</a>
-            </div>
-          </div>
+          <h3 id="目前前后端联调方式"><a href="#目前前后端联调方式" class="headerlink" title="目前前后端联调方式"></a>目前前后端联调方式</h3><p>1、编译之后联调-痛苦的二十分钟</p>
+<p>2、把js、css上传storage联调，但是这种方式常常有jquery无法引入的问题。并且也有编译上传storage的流程复杂问题。</p>
+<h3 id="加速方案-欺骗法"><a href="#加速方案-欺骗法" class="headerlink" title="加速方案-欺骗法"></a>加速方案-欺骗法</h3><p>1、前端Grunt服务绑定80端口，sudo启动服务</p>
+<p>2、配置Grunt代理，api请求到服务器</p>
+<p>3、配置www.xuetangx.com hosts到api服务地址例如192.168.9.242，登录</p>
+<p>4、配置www.xuetangx.com hosts到本地grunt服务127.0.0.1，刷新N次把直到本地或者浏览器dns缓存更新。</p>
+<p>以上即可正常工作</p>
+<h3 id="加速方案-CORS"><a href="#加速方案-CORS" class="headerlink" title="加速方案-CORS"></a>加速方案-CORS</h3><p>1、前端Grunt服务绑定80端口，sudo启动服务</p>
+<p>2、配置Grunt代理，api请求到服务器</p>
+<p>3、配置<a href="http://www.xuetangx.com/" target="_blank" rel="noopener">www.xuetangx.com</a> hosts到api服务地址例如192.168.9.242</p>
+<p>4、配置cors<a href="http://www.xuetangx.com/" target="_blank" rel="noopener">.xuetangx.com</a> hosts到本地grunt服务127.0.0.1</p>
+<p>5、Django配置cors</p>
+<p>6、Django 修改Middleware</p>
+<p>7、www.xuetangx.com 登录用户</p>
+<p>以上即可正常工作。</p>
+
         
       </div>
       
@@ -296,8 +305,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -377,6 +395,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#目前前后端联调方式"><span class="nav-number">1.</span> <span class="nav-text">目前前后端联调方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加速方案-欺骗法"><span class="nav-number">2.</span> <span class="nav-text">加速方案-欺骗法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加速方案-CORS"><span class="nav-number">3.</span> <span class="nav-text">加速方案-CORS</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
