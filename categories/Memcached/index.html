@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content=",,," />
+  <meta name="keywords" content="Huang, Bo, Python" />
 
 
 
@@ -79,18 +79,16 @@
 
 
 
-<meta name="description" content="MySQL 连接xuetangx DB最大连接数2048 1234567mysql&amp;gt; show variables like &amp;apos;max_connections&amp;apos;;+-----------------+-------+| Variable_name   | Value |+-----------------+-------+| max_connections | 2048">
-<meta name="keywords" content="Django,Mysql,Redis">
+<meta name="description" content="Python">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Django中Mysql Redis连接池">
-<meta property="og:url" content="http://yoursite.com/blog/technical/Django中Mysql Redis连接池.html">
+<meta property="og:title" content="Big Man`s Posts">
+<meta property="og:url" content="http://yoursite.com/categories/Memcached/index.html">
 <meta property="og:site_name" content="Big Man`s Posts">
-<meta property="og:description" content="MySQL 连接xuetangx DB最大连接数2048 1234567mysql&amp;gt; show variables like &amp;apos;max_connections&amp;apos;;+-----------------+-------+| Variable_name   | Value |+-----------------+-------+| max_connections | 2048">
+<meta property="og:description" content="Python">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-01-14T13:37:25.233Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Django中Mysql Redis连接池">
-<meta name="twitter:description" content="MySQL 连接xuetangx DB最大连接数2048 1234567mysql&amp;gt; show variables like &amp;apos;max_connections&amp;apos;;+-----------------+-------+| Variable_name   | Value |+-----------------+-------+| max_connections | 2048">
+<meta name="twitter:title" content="Big Man`s Posts">
+<meta name="twitter:description" content="Python">
 
 
 
@@ -120,13 +118,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/blog/technical/Django中Mysql Redis连接池.html"/>
+  <link rel="canonical" href="http://yoursite.com/categories/Memcached/"/>
 
 
 
 
 
-  <title>Django中Mysql Redis连接池 | Big Man`s Posts</title>
+  <title>Category: Memcached | Big Man`s Posts</title>
   
 
 
@@ -145,7 +143,7 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail">
+  <div class="container sidebar-position-left ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -229,55 +227,55 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
-    
-    
-    
-    <div class="post-block page">
-      <header class="post-header">
+  
+  
+  
+  <div class="post-block category">
 
-	<h1 class="post-title" itemprop="name headline">Django中Mysql Redis连接池</h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
-        
-        
-          <h2 id="MySQL-连接"><a href="#MySQL-连接" class="headerlink" title="MySQL 连接"></a>MySQL 连接</h2><p>xuetangx DB最大连接数2048</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables like &apos;max_connections&apos;;</span><br><span class="line">+-----------------+-------+</span><br><span class="line">| Variable_name   | Value |</span><br><span class="line">+-----------------+-------+</span><br><span class="line">| max_connections | 2048   |</span><br><span class="line">+-----------------+-------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
-<p>对Django接口进行了压测。DB报错数据库连接数过多，具体症状就是，如果设置MySQL的最大连接数为1000，压测过程中，很快连接数就会达到上限，调整上限到2000，依然如此。</p>
-<h4 id="Django的默认数据库连接"><a href="#Django的默认数据库连接" class="headerlink" title="Django的默认数据库连接"></a>Django的默认数据库连接</h4><p>Django对数据库的连接处理是这样的，Django程序接受到请求之后，在第一次访问数据库的时候会创建一个数据库连接，直到请求结束，关闭数据库连接。（Django opens a connection to the database when it first makes a database query. It keeps this connection open and reuses it in subsequent requests.）下次请求也是如此。因此，这种情况下，随着访问的并发数越来越高，就会产生大量的数据库连接。也就是我们在压测时出现的情况。</p>
-<h4 id="使用CONN-MAX-AGE减少数据库请求（连接池）"><a href="#使用CONN-MAX-AGE减少数据库请求（连接池）" class="headerlink" title="使用CONN_MAX_AGE减少数据库请求（连接池）"></a>使用CONN_MAX_AGE减少数据库请求（连接池）</h4><p>上面说了，每次请求都会创建新的数据库连接，这对于高访问量的应用来说完全是不可接受的。因此在Django1.6时，提供了持久的数据库连接，通过DATABASE配置CONN_MAX_AGE来控制每个连接的最大存活时间。</p>
-<p>The default value is 0, preserving the historical behavior of closing the database connection at the end of each request. To enable persistent connections, set CONN_MAX_AGE to a positive number of seconds. For unlimited persistent connections, set it to None.</p>
-<p>这个参数的原理就是在每次创建完数据库连接之后，把连接放到一个Theard.local的实例中。在request请求开始结束的时候，打算关闭连接时会判断是否超过CONN_MAX_AGE设置这个有效期。超过则关闭。每次进行数据库请求的时候其实只是判断local中有没有已存在的连接，有则复用。</p>
-<p>基于上述原因，Django中对于CONN_MAX_AGE的使用是有些限制的，使用不当，会适得其反。因为保存的连接是基于线程局部变量的，因此如果你部署方式采用多线程，必须要注意保证你的最大线程数不会多余数据库能支持的最大连接数（一个线程一个连接）。另外，如果使用开发模式运行程序（直接runserver的方式），建议不要设置CONN_MAX_AGE，因为这种情况下，每次请求都会创建一个Thread。同时如果你设置了CONN_MAX_AGE，将会导致你创建大量的不可复用的持久的连接。</p>
-<p>CONN_MAX_AGE设置多久</p>
-<p>CONN_MAX_AGE的时间怎么设置主要取决于数据库对空闲连接的管理，比如你的MySQL设置了空闲1分钟就关闭连接，那你的CONN_MAX_AGE就不能大于一分钟，不过DBA已经习惯了程序中的线程池的概念，会在数据库中设置一个较大的值。</p>
-<p>优化结果</p>
-<p>了解了上述过程之后，配置了CONN_MAX_AGE参数，再次测试，终于没有接到DBA通知，查看数据库连接数，最大700多。</p>
-<h2 id="Redis-连接"><a href="#Redis-连接" class="headerlink" title="Redis 连接"></a>Redis 连接</h2><p>在做一个直播活动时，所有评论数据保存Redis，收到Redis服务报错：max number of clients reached</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; CONFIG GET maxclients</span><br><span class="line">1) &quot;maxclients&quot;</span><br><span class="line">2) &quot;200&quot;</span><br></pre></td></tr></table></figure>
-<p>发现设置的这个最大连接数太小了，因为每次request都会创建redis连接，几百个人同时使用就达到最大上线了。</p>
-<p>Django-redis可以设置Redis连接池，并设置最大连接数，这样就能保证连接的复用和连接数的控制。</p>
-<p>the default connection pool is simple. You can only customize the maximum number of connections in the pool, by setting CONNECTION_POOL_KWARGS in the CACHES setting。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CACHES = &#123;</span><br><span class="line">    &quot;default&quot;: &#123;</span><br><span class="line">        &quot;BACKEND&quot;: &quot;django_redis.cache.RedisCache&quot;,</span><br><span class="line">        ...</span><br><span class="line">        &quot;OPTIONS&quot;: &#123;</span><br><span class="line">            &quot;CONNECTION_POOL_KWARGS&quot;: &#123;&quot;max_connections&quot;: 100&#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>END</p>
-
-        
+    <div id="posts" class="posts-collapse">
+      <div class="collection-title">
+        <h1>Memcached<small>Category</small>
+        </h1>
       </div>
+
       
-      
+        
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <h2 class="post-title">
+        
+            <a class="post-title-link" href="/technical/Memcached 用户被踢下线/" itemprop="url">
+              
+                <span itemprop="name">Memcached 用户被踢下线</span>
+              
+            </a>
+        
+      </h2>
+
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated"
+              datetime="2018-01-22T15:43:55+08:00"
+              content="2018-01-22" >
+          01-22
+        </time>
+      </div>
+
+    </header>
+  </article>
+
+
       
     </div>
-    
-    
-    
+
   </div>
+  
+  
+  
+
+  
+
 
 
           </div>
@@ -285,10 +283,6 @@
 
 
           
-
-  
-
-
 
         </div>
         
@@ -309,17 +303,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            Table of Contents
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            Overview
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -399,22 +384,6 @@
         </div>
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-连接"><span class="nav-number">1.</span> <span class="nav-text">MySQL 连接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Django的默认数据库连接"><span class="nav-number">1.0.1.</span> <span class="nav-text">Django的默认数据库连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用CONN-MAX-AGE减少数据库请求（连接池）"><span class="nav-number">1.0.2.</span> <span class="nav-text">使用CONN_MAX_AGE减少数据库请求（连接池）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-连接"><span class="nav-number">2.</span> <span class="nav-text">Redis 连接</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
@@ -548,10 +517,6 @@
   
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
-
-
 
   
 
