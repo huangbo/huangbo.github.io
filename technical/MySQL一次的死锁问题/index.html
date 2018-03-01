@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Huang, Bo, Python" />
+  <meta name="keywords" content="Mysql,死锁," />
 
 
 
@@ -79,16 +79,18 @@
 
 
 
-<meta name="description" content="Python">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Big Man`s Posts">
-<meta property="og:url" content="http://yoursite.com/tags/Memcached/index.html">
+<meta name="description" content="死锁InnoDB处理死锁的方式是将持有最少行级排他锁的事务进行回滚，保证另外一个事务成功执行，所以死锁不需要人工干预，但是这次他就是死了，救活了又死了。 查看innodb status发现出现了死锁问题 1mysql&amp;gt; show engine innodb status\G; 查找所有的Mysql线程，把相关线程kill掉 12mysql&amp;gt; show full processlist;">
+<meta name="keywords" content="Mysql,死锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL一次死锁问题">
+<meta property="og:url" content="http://yoursite.com/technical/MySQL一次的死锁问题/index.html">
 <meta property="og:site_name" content="Big Man`s Posts">
-<meta property="og:description" content="Python">
+<meta property="og:description" content="死锁InnoDB处理死锁的方式是将持有最少行级排他锁的事务进行回滚，保证另外一个事务成功执行，所以死锁不需要人工干预，但是这次他就是死了，救活了又死了。 查看innodb status发现出现了死锁问题 1mysql&amp;gt; show engine innodb status\G; 查找所有的Mysql线程，把相关线程kill掉 12mysql&amp;gt; show full processlist;">
 <meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-03-01T15:18:36.059Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Big Man`s Posts">
-<meta name="twitter:description" content="Python">
+<meta name="twitter:title" content="MySQL一次死锁问题">
+<meta name="twitter:description" content="死锁InnoDB处理死锁的方式是将持有最少行级排他锁的事务进行回滚，保证另外一个事务成功执行，所以死锁不需要人工干预，但是这次他就是死了，救活了又死了。 查看innodb status发现出现了死锁问题 1mysql&amp;gt; show engine innodb status\G; 查找所有的Mysql线程，把相关线程kill掉 12mysql&amp;gt; show full processlist;">
 
 
 
@@ -118,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/tags/Memcached/"/>
+  <link rel="canonical" href="http://yoursite.com/technical/MySQL一次的死锁问题/"/>
 
 
 
 
 
-  <title>Tag: Memcached | Big Man`s Posts</title>
+  <title>MySQL一次死锁问题 | Big Man`s Posts</title>
   
 
 
@@ -143,7 +145,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -227,54 +229,222 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>Memcached<small>Tag</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/technical/MySQL一次的死锁问题/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Huang Bo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://p2jr9rg1a.bkt.clouddn.com/IMG_5505.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Big Man`s Posts">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/technical/Memcached 用户被踢下线/" itemprop="url">
-              
-                <span itemprop="name">基于Memcached Session 用户被频繁踢下线</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">MySQL一次死锁问题</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2018-01-22T15:43:55+08:00"
-              content="2018-01-22" >
-          01-22
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
 
-    </header>
-  </article>
+            
 
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T23:18:36+08:00">
+                2018-03-01
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">Mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/technical/MySQL一次的死锁问题/" class="leancloud_visitors" data-flag-title="MySQL一次死锁问题">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h4><p>InnoDB处理死锁的方式是将持有最少行级排他锁的事务进行回滚，保证另外一个事务成功执行，所以死锁不需要人工干预，但是这次他就是死了，救活了又死了。</p>
+<p>查看innodb status发现出现了死锁问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show engine innodb status\G;</span><br></pre></td></tr></table></figure>
+<p>查找所有的Mysql线程，把相关线程kill掉</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show full processlist;</span><br><span class="line">mysql&gt; kill id;</span><br></pre></td></tr></table></figure>
+<p>当同事通知我说数据库失去响应，赶紧保护现场，查看问题，发现死锁后杀掉相关线程，可以正常访问，再次进行插入操作时又死了！即使没有其他请求，只有我一个线程进行插入操作。开始只看了数据盘是有空间的，但是确实有一个盘是满的，后来才发现这binglog日志在这个满了的盘里呢！！</p>
+<p>如果还有问题，就重启数据库吧。</p>
+<p>其他的数据库信息可以去information_schema这个数据库查找。</p>
+<p>死锁示例：</p>
+<p>因为在一个事务中，等事务commit后才会走释放锁的流程</p>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>事务1</th>
+<th>事务2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>begin;</td>
+<td>begin;</td>
+</tr>
+<tr>
+<td>2</td>
+<td></td>
+<td>DELETE from users where uid=’bbb’;执行成功</td>
+</tr>
+<tr>
+<td>3</td>
+<td>DELETE from users where uid=’bbb’;等待</td>
+<td>空</td>
+</tr>
+<tr>
+<td>4</td>
+<td>ERROR 1213 (40001)</td>
+<td>insert INTO users VALUES(2,’bbb’); 成功</td>
+</tr>
+</tbody>
+</table>
 
       
     </div>
+    
+    
+    
 
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Mysql/" rel="tag"># Mysql</a>
+          
+            <a href="/tags/死锁/" rel="tag"># 死锁</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/technical/Memcached 用户被踢下线/" rel="next" title="基于Memcached Session 用户被频繁踢下线">
+                <i class="fa fa-chevron-left"></i> 基于Memcached Session 用户被频繁踢下线
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -282,6 +452,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -302,8 +476,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -383,6 +566,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#死锁"><span class="nav-number">1.</span> <span class="nav-text">死锁</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -516,6 +715,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
