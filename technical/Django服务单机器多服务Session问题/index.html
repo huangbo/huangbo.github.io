@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Django Session在Django中，默认会把session保存在setting指定的数据库django_session表中，除此之外，也可以通过指定session engine，使session保存在文件(file)，内存(cache)中。">
+<meta name="description" content="Django Session在Django中，默认会把session保存在setting指定的数据库django_session表中，除此之外，也可以通过指定session engine，使session保存在文件(file)，内存(cache)中。 在数据库中session_key是放置在cookie中的sessionid，它是唯一的，而session_data则存放序列化后的session数据">
 <meta name="keywords" content="Django,CORS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Django服务单机器多服务Session问题">
 <meta property="og:url" content="http://yoursite.com/technical/Django服务单机器多服务Session问题/index.html">
 <meta property="og:site_name" content="Big Man`s Posts">
-<meta property="og:description" content="Django Session在Django中，默认会把session保存在setting指定的数据库django_session表中，除此之外，也可以通过指定session engine，使session保存在文件(file)，内存(cache)中。">
+<meta property="og:description" content="Django Session在Django中，默认会把session保存在setting指定的数据库django_session表中，除此之外，也可以通过指定session engine，使session保存在文件(file)，内存(cache)中。 在数据库中session_key是放置在cookie中的sessionid，它是唯一的，而session_data则存放序列化后的session数据">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-03-01T15:26:12.223Z">
+<meta property="og:updated_time" content="2018-03-01T15:26:38.734Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Django服务单机器多服务Session问题">
-<meta name="twitter:description" content="Django Session在Django中，默认会把session保存在setting指定的数据库django_session表中，除此之外，也可以通过指定session engine，使session保存在文件(file)，内存(cache)中。">
+<meta name="twitter:description" content="Django Session在Django中，默认会把session保存在setting指定的数据库django_session表中，除此之外，也可以通过指定session engine，使session保存在文件(file)，内存(cache)中。 在数据库中session_key是放置在cookie中的sessionid，它是唯一的，而session_data则存放序列化后的session数据">
 
 
 
@@ -276,7 +276,7 @@
               
                 <span class="post-meta-item-text">Post modified&#58;</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T23:26:12+08:00">
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T23:26:38+08:00">
                 2018-03-01
               </time>
             
@@ -344,6 +344,8 @@
 
       
         <h4 id="Django-Session"><a href="#Django-Session" class="headerlink" title="Django Session"></a>Django Session</h4><p>在Django中，默认会把session保存在setting指定的数据库django_session表中，除此之外，也可以通过指定session engine，使session保存在文件(file)，内存(cache)中。</p>
+<p>在数据库中session_key是放置在cookie中的sessionid，它是唯一的，而session_data则存放序列化后的session数据字符串。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">from django.contrib.sessions.models import Session</span><br><span class="line">from django.contrib.auth.models import User</span><br><span class="line"></span><br><span class="line">session_key = &quot;8cae76c505f15432b48c8292a7dd0e54&quot;</span><br><span class="line"></span><br><span class="line">session = Session.objects.get(session_key=session_key)</span><br><span class="line">uid = session.get_decoded().get(&quot;_auth_user_id&quot;)</span><br><span class="line">user = User.objects.get(pk=uid)</span><br><span class="line"></span><br><span class="line">print user.username, user.get_full_name(), user.email</span><br></pre></td></tr></table></figure>
 
       
     </div>
