@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Big Man`s Posts">
 <meta property="og:description" content="Django Session在Django中，默认会把session保存在setting指定的数据库django_session表中，除此之外，也可以通过指定session engine，使session保存在文件(file)，内存(cache)中。 在数据库中session_key是放置在cookie中的sessionid，它是唯一的，而session_data则存放序列化后的session数据">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-03-01T15:26:58.252Z">
+<meta property="og:updated_time" content="2018-03-01T15:27:20.409Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Django服务单机器多服务Session问题">
 <meta name="twitter:description" content="Django Session在Django中，默认会把session保存在setting指定的数据库django_session表中，除此之外，也可以通过指定session engine，使session保存在文件(file)，内存(cache)中。 在数据库中session_key是放置在cookie中的sessionid，它是唯一的，而session_data则存放序列化后的session数据">
@@ -276,7 +276,7 @@
               
                 <span class="post-meta-item-text">Post modified&#58;</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T23:26:58+08:00">
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T23:27:20+08:00">
                 2018-03-01
               </time>
             
@@ -350,6 +350,9 @@
 <p>其实默认是httponly属性，在客户端js是不可读的。防止XSS攻击</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">response = Response(response_data, status=status.HTTP_200_OK)</span><br><span class="line">csrf_token = generate_csrf_token(check_res.id)</span><br><span class="line">response.set_cookie(&quot;csrf_token&quot;, csrf_token)</span><br><span class="line">return response</span><br></pre></td></tr></table></figure>
 <p>REST Framework可以这样设置cookie，默认属性<strong>不是</strong>httponly。在客户端js是可读的。用于传递csrf_token或者其他需要的信息。</p>
+<h4 id="同一个域名（服务器）下，不同端口的Django服务SESSION-COOKIE-NAME-都使用sessionId存在的问题："><a href="#同一个域名（服务器）下，不同端口的Django服务SESSION-COOKIE-NAME-都使用sessionId存在的问题：" class="headerlink" title="同一个域名（服务器）下，不同端口的Django服务SESSION_COOKIE_NAME 都使用sessionId存在的问题："></a>同一个域名（服务器）下，不同端口的Django服务SESSION_COOKIE_NAME 都使用sessionId存在的问题：</h4><h5 id="情景描述："><a href="#情景描述：" class="headerlink" title="情景描述："></a>情景描述：</h5><p>同一个域名（服务器）下，两个监听不同端口的Django服务，用Chrome先访问8000端口的Django服务，8000端口的Django服务返回时会在Cookie中带上sessionId，然后再用这个Chrome访问8001端口的Django服务，因为是在一个域名下，访问时会带上这个域名下所有的Cookie（非ajax请求，没有跨域问题），即访问8000端口Django服务时返回的Cookie，但是8001端口的Django服务判断这个Cookie中的sessionId在本服务器上没有，不合法，所以会重新生成一个新的sessionId返回。</p>
+<h5 id="解决方案："><a href="#解决方案：" class="headerlink" title="解决方案："></a>解决方案：</h5><p>把各端口的Django服务SESSION_COOKIE_NAME 设置为不同的值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># proj/proj/multimiddleware.py</span><br><span class="line"></span><br><span class="line">from django.conf import settings</span><br><span class="line"></span><br><span class="line">class MultiPortMiddleware(object):</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    Middleware changes the SESSION_COOKIE_NAME to use the current port in the name</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    def process_request(self, request):</span><br><span class="line">        settings.SESSION_COOKIE_NAME = &quot;sessionid&quot; + request.META[&quot;SERVER_PORT&quot;]</span><br><span class="line">        return None</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -546,7 +549,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Django-Session"><span class="nav-number">1.</span> <span class="nav-text">Django Session</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Django-Cookie"><span class="nav-number">2.</span> <span class="nav-text">Django Cookie</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Django-Session"><span class="nav-number">1.</span> <span class="nav-text">Django Session</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Django-Cookie"><span class="nav-number">2.</span> <span class="nav-text">Django Cookie</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#同一个域名（服务器）下，不同端口的Django服务SESSION-COOKIE-NAME-都使用sessionId存在的问题："><span class="nav-number">3.</span> <span class="nav-text">同一个域名（服务器）下，不同端口的Django服务SESSION_COOKIE_NAME 都使用sessionId存在的问题：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#情景描述："><span class="nav-number">3.1.</span> <span class="nav-text">情景描述：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#解决方案："><span class="nav-number">3.2.</span> <span class="nav-text">解决方案：</span></a></li></ol></li></ol></div>
             
 
           </div>
