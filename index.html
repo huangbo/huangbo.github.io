@@ -261,7 +261,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/technical/Memcached 用户被踢下线/" itemprop="url">基于Memcached Session 存储用户被踢下线</a></h1>
+                <a class="post-title-link" href="/technical/Memcached 用户被踢下线/" itemprop="url">基于Memcached Session 用户被频繁踢下线</a></h1>
         
 
         <div class="post-meta">
@@ -277,8 +277,8 @@
               
                 <span class="post-meta-item-text">Post modified&#58;</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-01-22T15:55:19+08:00">
-                2018-01-22
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T15:52:41+08:00">
+                2018-03-01
               </time>
             
           </span>
@@ -313,7 +313,7 @@
 
           
           
-             <span id="/technical/Memcached 用户被踢下线/" class="leancloud_visitors" data-flag-title="基于Memcached Session 存储用户被踢下线">
+             <span id="/technical/Memcached 用户被踢下线/" class="leancloud_visitors" data-flag-title="基于Memcached Session 用户被频繁踢下线">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -437,8 +437,8 @@ Memcac
               
                 <span class="post-meta-item-text">Post modified&#58;</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-01-14T23:20:59+08:00">
-                2018-01-14
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T15:52:50+08:00">
+                2018-03-01
               </time>
             
           </span>
@@ -506,10 +506,10 @@ Memcac
       
         
           
-          目前前后端联调方式1、编译之后联调-痛苦的二十分钟
+          目前前后端联调方式1、编译之后联调-痛苦的二十分钟，手滑再来痛苦的二十分钟
 2、把js、css上传storage联调，但是这种方式常常有jquery无法引入的问题。并且也有编译上传storage的流程复杂问题。
-加速方案-欺骗法1、前端Grunt服务绑定80端口，sudo启动服务
-2、配置Grunt代理，api请求到服务器
+优化方案欺骗法1、前端Grunt服务绑定80端口，sudo启动服务
+2、配置Grunt 
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -599,8 +599,8 @@ Memcac
               
                 <span class="post-meta-item-text">Post modified&#58;</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-01-14T21:37:25+08:00">
-                2018-01-14
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T16:21:25+08:00">
+                2018-03-01
               </time>
             
           </span>
@@ -668,8 +668,9 @@ Memcac
       
         
           
-          MySQL 连接xuetangx DB最大连接数2048
-1234567mysql&gt; show variables like &apos;max_connections&apos;;+-----------------+-------+| Variable_name   | Value |+-
+          MySQL 连接对Django服务进行压测，DB报错数据库连接数过多，如果设置MySQL的最大连接数为1000，很快连接数就会达到上限，调整到2000，也很快连接数达到上限。
+xuetangx DB最大连接数2048
+1234567mysql&gt; show variables like &apo
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -743,7 +744,7 @@ Memcac
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/technical/ngrok/" itemprop="url">Ngrok 的艰难生存</a></h1>
+                <a class="post-title-link" href="/technical/ngrok/" itemprop="url">Ngrok 在公司服务器上的艰难生存</a></h1>
         
 
         <div class="post-meta">
@@ -759,8 +760,8 @@ Memcac
               
                 <span class="post-meta-item-text">Post modified&#58;</span>
               
-              <time title="Post modified" itemprop="dateModified" datetime="2018-01-22T15:54:49+08:00">
-                2018-01-22
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-01T23:10:40+08:00">
+                2018-03-01
               </time>
             
           </span>
@@ -795,7 +796,7 @@ Memcac
 
           
           
-             <span id="/technical/ngrok/" class="leancloud_visitors" data-flag-title="Ngrok 的艰难生存">
+             <span id="/technical/ngrok/" class="leancloud_visitors" data-flag-title="Ngrok 在公司服务器上的艰难生存">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -828,10 +829,10 @@ Memcac
       
         
           
-          由于部署的服务器是公司的某台反向代理服务器，nginx监听了80端口，ngrok也需要监听80端口，可以通过如下几种方案解决：
+          Ngrok 服务原理由于部署的服务器是公司的某台反向代理服务器，nginx监听了80端口，ngrok也需要监听80端口，可以通过如下几种方案解决：
 
 nginx只监听公网网卡的80端口，ngrok只监听内网网卡的80端口（一般会有两块网卡）
-把ngrok服务放在docker中，可以通过监听docker中的80启动ngr
+把ngrok服务放在docker中，可以通过监听docke
           ...
           <!--noindex-->
           <div class="post-button text-center">
