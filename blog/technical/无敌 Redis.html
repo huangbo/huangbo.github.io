@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content=",,,,," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Redis 单线程架构Redis 高性能 Redis 是跑在单进程单线程中的， 没有多进程、多线程创建切换销毁带来的消耗，避免了由于多进程多线程应用的引入导致代码实现复杂度的提升，减少了出错的可能性。 Redis 使用 I/O 多路复用技术，Redis 能以单进程单线程运行的同时服务成千上万个文件描述符，本身的并发效率不成问题。  非常快速操作内存里数据，官方给出的数据读写性能达到10万/s  I">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="website">
+<meta property="og:title" content="无敌Redis">
+<meta property="og:url" content="http://yoursite.com/blog/technical/无敌 Redis.html">
+<meta property="og:site_name" content="Big Man`s Posts">
+<meta property="og:description" content="Redis 单线程架构Redis 高性能 Redis 是跑在单进程单线程中的， 没有多进程、多线程创建切换销毁带来的消耗，避免了由于多进程多线程应用的引入导致代码实现复杂度的提升，减少了出错的可能性。 Redis 使用 I/O 多路复用技术，Redis 能以单进程单线程运行的同时服务成千上万个文件描述符，本身的并发效率不成问题。  非常快速操作内存里数据，官方给出的数据读写性能达到10万/s  I">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-03-07T15:09:29.561Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="无敌Redis">
+<meta name="twitter:description" content="Redis 单线程架构Redis 高性能 Redis 是跑在单进程单线程中的， 没有多进程、多线程创建切换销毁带来的消耗，避免了由于多进程多线程应用的引入导致代码实现复杂度的提升，减少了出错的可能性。 Redis 使用 I/O 多路复用技术，Redis 能以单进程单线程运行的同时服务成千上万个文件描述符，本身的并发效率不成问题。  非常快速操作内存里数据，官方给出的数据读写性能达到10万/s  I">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/blog/technical/无敌 Redis.html"/>
+
+
+
+
+
+  <title>无敌Redis | Big Man`s Posts</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Big Man`s Posts</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Other Is Bitch</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+	<h1 class="post-title" itemprop="name headline">无敌Redis</h1>
+
+
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <h2 id="Redis-单线程架构"><a href="#Redis-单线程架构" class="headerlink" title="Redis 单线程架构"></a>Redis 单线程架构</h2><h3 id="Redis-高性能"><a href="#Redis-高性能" class="headerlink" title="Redis 高性能"></a>Redis 高性能</h3><ul>
+<li>Redis 是跑在单进程单线程中的， 没有多进程、多线程创建切换销毁带来的消耗，避免了由于多进程多线程应用的引入导致代码实现复杂度的提升，减少了出错的可能性。</li>
+<li>Redis 使用 I/O 多路复用技术，Redis 能以单进程单线程运行的同时服务成千上万个文件描述符，本身的并发效率不成问题。</li>
+</ul>
+<p>非常快速操作内存里数据，官方给出的数据读写性能达到10万/s</p>
+<blockquote>
+<p>I/O 多路复用模块封装了底层的 <code>select</code>、<code>epoll</code>这些 I/O 多路复用函数。文件事件处理器使用 I/O 多路复用模块同时监听多个 FD，当 <code>accept</code>、<code>read</code>、<code>write</code> 和 <code>close</code> 文件事件产生时，文件事件处理器就会回调 FD 绑定的事件处理器。</p>
+</blockquote>
+<h3 id="Redis-单线程阻塞"><a href="#Redis-单线程阻塞" class="headerlink" title="Redis 单线程阻塞"></a>Redis 单线程阻塞</h3><p>Reids线程被阻塞，对于高性能Redis服务来说是致命的。</p>
+<ul>
+<li>慢查询<ul>
+<li>例如数据量比较大执行hgetall操作</li>
+<li>redis也提供了一些简单的计算功能，比如排序、聚合等，密集cpu操作</li>
+</ul>
+</li>
+<li>cpu被占满，因为单线程只使用一个cpu</li>
+<li>持久化过程阻塞<ul>
+<li>fork子进程过程阻塞</li>
+<li>AOF持久化将aof buf刷盘不及时阻塞主线程</li>
+</ul>
+</li>
+</ul>
+<h2 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h2><p>Redis存储键值对实际使用的是hashtable的数据结构，所以时间负责度0(1)。</p>
+<p>Redis并不是一个无格式的key-value数据存储服务。不同于传统的key-values存储，Redis的value支持复杂的数据结构。</p>
+<ul>
+<li>String</li>
+<li>Lists：collections of string elements sorted according to the order of insertion</li>
+<li>Sets：collections of unique, unsorted string elements.</li>
+<li>Sorted sets：每个元素与score相关联</li>
+<li>Hashes：values 其实是一个Hash Map</li>
+<li>Bitmaps：实际上不是一个数据结构，是一个字符串，但是可以对字符串的位进行操作。</li>
+<li>HypeLogLogs</li>
+<li>GEO</li>
+</ul>
+<h2 id="Redis-类型"><a href="#Redis-类型" class="headerlink" title="Redis 类型"></a>Redis 类型</h2><p>Redis keys是二进制安全的，可以使用任何二进制序列作为key，Redis key推荐规则：</p>
+<ul>
+<li>long key不仅消耗更多内存而且查询这类key值的时候增加计算量。可以使用SHA1等hash</li>
+<li>Redis key尽量具有可读性，例如”user:1000:followers” 较 “u:1000flw”更具有可读性，但是多使用的内存空间较key object和value object本身来说可以不比计较。</li>
+</ul>
+<h3 id="Redis-string"><a href="#Redis-string" class="headerlink" title="Redis - string"></a>Redis - string</h3><ul>
+<li><p>INCR DECR INCRBY DECRBY</p>
+<p>INCR 命令把string value解析成integer，加1之后设置为key的新值。INCR 是原子（atomic）操作，如果有两个client同一时间对key进行INCR操作，两个client都把key的值加到11，但是最后key的值为12。</p>
+</li>
+</ul>
+<ul>
+<li><p>Redis expires<br>When the time to live elapses, the key is automatically destroyed, exactly as if the user called the DEL command with the key.</p>
+<p>Redis对于列表、集合、散列、有序集合这样的容器来说，键过期命令只能为整个键设置过期时间，而没法为键里面的单个元素设置过期时间。使用存储时间戳的有序集合来实现单个元素的过期操作。</p>
+</li>
+</ul>
+<ul>
+<li><p>TTL<br>Returns the remaining time to live of a key that has a timeout.</p>
+<ul>
+<li>The command returns -2 if the key does not exist.</li>
+<li>The command returns -1 if the key exists but has no associated expire.</li>
+</ul>
+</li>
+<li><p>setnx</p>
+<p>键必须不存在才能设置成功，只有一个客户端设置成功，可以分布式锁的一种实现方式。</p>
+</li>
+<li><p>mget 相比 get在批量获取时更加高效，节省了网络io时间。例如1000次读取</p>
+<ul>
+<li>mget 时间为1x1 + 1000x0.1</li>
+<li>get 时间为1000x1 + 1000x0.1</li>
+</ul>
+<p>但是如果mget批量获取数据量太大可能会阻塞Redis主线程。</p>
+</li>
+</ul>
+<h3 id="Redis-List"><a href="#Redis-List" class="headerlink" title="Redis List"></a>Redis List</h3><p>Redis lists 是基于Linked Lists（双向链表） 实现，意味着即使在一个list中有百万个元素，在头部和尾部添加一个元素的操作，其时间复杂度也是常量级别的。用LPUSH在10个元素list的头部添加一个元素与在千万元素list头部添加一个元素的速度相同。<br>但是通过index访问元素的速度却没有用数组实现的list快。<br>BLPOP、BRPOP</p>
+<ul>
+<li>是LPOP、RPOP的block的版本。list中没有元素可以被pop的时候，阻塞直到发现可以pop的元素或者等待超时</li>
+</ul>
+<ul>
+<li>LTRIM<br>使用场景：<br>只需要最新的N条数据。The LTRIM command is similar to LRANGE, but instead of displaying the specified range of elements it sets this range as the new list value. All the elements outside the given range are removed.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; lrange mylist <span class="number">0</span> <span class="number">-1</span></span><br><span class="line"><span class="number">1</span>) <span class="string">"2"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"a"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"1"</span></span><br><span class="line"><span class="number">4</span>) <span class="string">"3"</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; ltrim mylist <span class="number">0</span> <span class="number">1</span></span><br><span class="line">OK</span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; lrange mylist <span class="number">0</span> <span class="number">-1</span></span><br><span class="line"><span class="number">1</span>) <span class="string">"2"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"a"</span></span><br></pre></td></tr></table></figure>
+<h3 id="Redis-Hashes"><a href="#Redis-Hashes" class="headerlink" title="Redis Hashes"></a>Redis Hashes</h3><p>应用场景：<br>在存储结构化数据的（例如用户的姓名、年龄、性别）时候可能会把这些信息打包成HashMap，然后序列化后存储为一个key的值。修改结构化数据某一项时需要读出这个key的值然后进行反序列化操作，修改值后，序列化存储回去，这样会导致两个问题：</p>
+<ul>
+<li>序列化、反序列化、读出全部值、写入全部值，增加开销</li>
+<li>不适合并发操作</li>
+</ul>
+<p>Redis Hash内部存储的value是一个HashMap，这个Hash Map的key是结构化数据的成员的属性名，value是结构化数据的成员的属性值。所以在Redis Hash中通过key + Hash Map 属性就可以请求和操作对应的属性值了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; HMSET user:<span class="number">100</span> username huangbo birthyear <span class="number">1990</span></span><br><span class="line">OK</span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; HGETALL user:<span class="number">100</span></span><br><span class="line"><span class="number">1</span>) <span class="string">"username"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"huangbo"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"birthyear"</span></span><br><span class="line"><span class="number">4</span>) <span class="string">"1990"</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; HGET user:<span class="number">100</span> birthyear</span><br><span class="line"><span class="string">"1990"</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; HINCRBY user:<span class="number">100</span> birthyear <span class="number">10</span></span><br><span class="line">(integer) <span class="number">2000</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; HGET user:<span class="number">100</span> birthyear</span><br><span class="line"><span class="string">"2000"</span></span><br></pre></td></tr></table></figure>
+<h3 id="Redis-Sets"><a href="#Redis-Sets" class="headerlink" title="Redis Sets"></a>Redis Sets</h3><p>Redis sets 中的元素是无序的。<br>应用场景：<br>Redis 为集合提供了交集、并集、差集等操作，可以非常方便的实现共同关注、共同喜好等功能。</p>
+<h3 id="Redis-Sorted-Sets"><a href="#Redis-Sorted-Sets" class="headerlink" title="Redis Sorted Sets"></a>Redis Sorted Sets</h3><p>sorted sets 是由一些unique non-repeating的string元素组成，相似于set<br>sorted sets 的每一个元素都会与一个score相关联，相似于hash</p>
+<p>Redis Sorted Set order规则：</p>
+<ul>
+<li>score</li>
+<li>score 相同，字母顺序</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; ZADD age <span class="number">1990</span> <span class="string">'huangbo'</span> <span class="number">1991</span> <span class="string">'bo'</span> <span class="number">1989</span> <span class="string">'hb'</span></span><br><span class="line">(integer) <span class="number">3</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; ZRANGE age <span class="number">0</span> <span class="number">-1</span> WITHSCORES</span><br><span class="line"><span class="number">1</span>) <span class="string">"hb"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"1989"</span></span><br><span class="line"><span class="number">3</span>) <span class="string">"huangbo"</span></span><br><span class="line"><span class="number">4</span>) <span class="string">"1990"</span></span><br><span class="line"><span class="number">5</span>) <span class="string">"bo"</span></span><br><span class="line"><span class="number">6</span>) <span class="string">"1991"</span></span><br><span class="line"><span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">6379</span>&gt; ZRANGEBYSCORE age -inf <span class="number">1990</span></span><br><span class="line"><span class="number">1</span>) <span class="string">"hb"</span></span><br><span class="line"><span class="number">2</span>) <span class="string">"huangbo"</span></span><br></pre></td></tr></table></figure>
+<p>应用场景：</p>
+<ul>
+<li>存储学生的成绩：value为学号， score为成绩，这样在把学生数据插入集合的时候就已经是排序好的。</li>
+<li>权重不同的任务队列：score为消息的级别权重</li>
+</ul>
+<p><strong>Sorted Set也有并集和交集</strong></p>
+<h3 id="Bitmaps"><a href="#Bitmaps" class="headerlink" title="Bitmaps"></a>Bitmaps</h3><p>假设某个网站1亿用户，每天5千万活跃，用集合和Bitmaps分别存储活跃用户</p>
+<p>集合：64位x50000000 = 400M</p>
+<p>Bitmap：1位x100000000 = 12.5M</p>
+<p>但是如果每天活跃用户数比较少，假设10万，那么用集合更节省内存空间。</p>
+<h3 id="HypeLogLogs"><a href="#HypeLogLogs" class="headerlink" title="HypeLogLogs"></a>HypeLogLogs</h3><p>以极小的内存统计一个或者多个HypeLogLogs独立用总数（例如两天的独立用户总数）</p>
+<h2 id="Redis-事务："><a href="#Redis-事务：" class="headerlink" title="Redis 事务："></a>Redis 事务：</h2><h3 id="原子性（Atomicity）"><a href="#原子性（Atomicity）" class="headerlink" title="原子性（Atomicity）"></a>原子性（Atomicity）</h3><p>Redis 本身提供的API都是原子操作， 那么Redis事务其实是要保证批量API操作的原子性即在事务执行的过程中，不会被其他客户端发送过来的请求打断。因为Redis单线程架构，命令从客户端到达服务端不会被立即执行，所有的命令都会进入一个队列中，然后串行执行，也就没有并发的问题。</p>
+<p>流水线pipeline机制能把一组Redis命令进行组装，一次性传输给Redis，再将这组命令的执行结果顺序返回给客户端。但是这个过程不是原子操作，原生批量命令是原子的（mget）。Redis为了解决多条命令的原子性，Redis提供了简单的事务watch功能和lua脚本（lua脚本在Redis中是原子执行的）来解决这个问题。</p>
+<h3 id="Redis-事务"><a href="#Redis-事务" class="headerlink" title="Redis 事务"></a>Redis 事务</h3><ol>
+<li>MULTI 开启一个事务，客户端向Redis发送多条命令，这些命令不会被立即执行，而是放到一个队列中，直到接收到EXEC触发执行。<br>可以通过入队后返回的状态判断是否入队成功，如果失败，取消事务</li>
+<li>EXEC 触发并执行事务中的所有命令<br>如果EXEC 后出现错误，会忽略错误的命令，继续执行。这就是Redis事务执行过程中的对错误情况作出了权衡取舍，放弃了回滚！</li>
+</ol>
+<p>被MUTI命令和EXEC命令包围的所有命令都执行完毕后，Redis才会处理其他客户端的命令。</p>
+<p>官方解释：</p>
+<blockquote>
+<p>Redis 操作失败的原因只可能是语法错误或者错误的数据库类型操作，这些都是在开发层面能发现的问题不会进入到生产环境，因此不需要回滚。</p>
+</blockquote>
+<p>Redis 内部设计推崇简单和高性能，因此不需要回滚能力。</p>
+<h4 id="Redis-并发"><a href="#Redis-并发" class="headerlink" title="Redis 并发"></a>Redis 并发</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">conn = redis.StrictRedis(host=&apos;localhost&apos;, port=6379, db=0)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def notrans():</span><br><span class="line">    print(conn.incr(&apos;notrans:&apos;))</span><br><span class="line">    time.sleep(.1)</span><br><span class="line">    print(conn.incr(&apos;notrans:&apos;, -1))</span><br><span class="line"></span><br><span class="line">for i in range(10):</span><br><span class="line">    threading.Thread(target=notrans).start()</span><br><span class="line">	time.sleep(.5)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">conn = redis.StrictRedis(host=&apos;localhost&apos;, port=6379, db=0)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def trans():</span><br><span class="line">    pipeline = conn.pipeline()</span><br><span class="line">    pipeline.incr(&apos;notrans:&apos;)</span><br><span class="line">    time.sleep(.1)</span><br><span class="line">    pipeline.incr(&apos;notrans:&apos;, -1)</span><br><span class="line">    print(pipeline.execute())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">for i in range(10):</span><br><span class="line">    threading.Thread(target=trans).start()</span><br><span class="line">	time.sleep(.5)</span><br></pre></td></tr></table></figure>
+<p>Redis在执行事务的过程中，会延迟执行已经入队列的命令直到客户端发送EXEC命令为止，因此包括Python客户端在内的很多Redis客户端都会等到EXEC命令接收到之后才一次性的将MUTI命令、要在事务中执行的一系列命令以及EXEC命令全部发送给Redis服务器，这样可以减少客户端与服务器端通信次数来提高通信性能。因此在MUTI命令发出之后由于还没有通知到Redis服务器端，所以Redis服务器端的的数据还是会被修改。使用WATCH命令监控数据是否变化，如果变化了重新判断事务执行的先决条件是否成立。</p>
+<p>关系型数据库在update时候被访问的数据行被加锁（InnoDB），直到事务被提交或者回滚。如果其他客户端试图对加锁的行进行update时会被阻塞。Redis为了尽可能的减少客户端被阻塞并不会在WATCH的时候加锁只会在被WATCH的数据更改时通知执行了WATCH的客户端，并不会阻塞其他客户端对数据的修改。</p>
+<p>会因为在执行EXEC命令时数据可能发生变化不再符合执行条件而得到不想要的结果。</p>
+<h4 id="使用WATCH事务处理-（乐观锁）"><a href="#使用WATCH事务处理-（乐观锁）" class="headerlink" title="使用WATCH事务处理 （乐观锁）"></a>使用WATCH事务处理 （乐观锁）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">import time</span><br><span class="line">import redis</span><br><span class="line">conn = redis.StrictRedis(host=&apos;localhost&apos;, port=6379, db=0)</span><br><span class="line">pipeline = conn.pipeline()</span><br><span class="line"></span><br><span class="line">itemid = &quot;item1&quot;</span><br><span class="line">price = 10</span><br><span class="line">sellerid = &quot;1&quot;</span><br><span class="line">inventory = &quot;inventory:%s&quot;%sellerid</span><br><span class="line">market = &quot;market&quot;</span><br><span class="line">end = time.time() + 10</span><br><span class="line">conn.sadd(inventory, itemid)</span><br><span class="line">while time.time() &lt; end:</span><br><span class="line">    try:</span><br><span class="line">        pipeline.watch(inventory)</span><br><span class="line">        if not pipeline.sismember(inventory, itemid):</span><br><span class="line">            pipeline.unwatch()</span><br><span class="line">            print(&apos;remove&apos;)</span><br><span class="line">            break</span><br><span class="line">        pipeline.multi()</span><br><span class="line">        pipeline.zadd(market, price, itemid)</span><br><span class="line">        pipeline.srem(inventory, itemid)</span><br><span class="line">        pipeline.execute()</span><br><span class="line">        print(&apos;success&apos;)</span><br><span class="line">        break</span><br><span class="line">    except redis.exceptions.WatchError:</span><br><span class="line">        print(&apos;retry&apos;)</span><br><span class="line">        continue</span><br></pre></td></tr></table></figure>
+<p>在事务之前确保事务中的key没有被其他客户端修改，否则不执行。</p>
+<p>使用WATCH命令监控inventory在WATCH之后EXEC之前发生改变会引发redis.exceptions.WatchError异常，然后重试是否还符合交易条件。但是出现了可能会数据发生改变一直重试或者重试次数过多失败的情况，有明显的性能问题。</p>
+<h2 id="Redis-持久化"><a href="#Redis-持久化" class="headerlink" title="Redis 持久化"></a>Redis 持久化</h2><p>持久化的目的是：redis作为一个内存数据库，无论是RDB还是AOF，都是用作redis重启之后数据恢复，读出数据到内存中</p>
+<ol>
+<li><p>RDB-某个时间点数据快照<br>可以将某一时刻的所有数据生成快照，Redis进程fork一个子进程将数据写成RDB文件，因为是全量快照并且有fork子进程的行为，无法做到实时或者秒级持久化。</p>
+<p>阻塞只发生在fork阶段。</p>
+</li>
+<li><p>AOF（append-only file）-主流持久化方式</p>
+<p>主线程将被执行的写命令追加到aof buf中，后台同步线程将缓冲区将aof buf中数据同步到硬盘。主线程如果发现距离上一次同步到硬盘成功超过2s，主线程会阻塞知道新的同步硬盘操作完成。</p>
+<p>与mysql binlog不同的是AOF是可识别的纯文本，为了不影响性能，可以设置1s同步一次AOF文件，而不是每次写入操作都实时同步到AOF文件。</p>
+</li>
+</ol>
+<h2 id="Redis-主从复制"><a href="#Redis-主从复制" class="headerlink" title="Redis 主从复制"></a>Redis 主从复制</h2><p>使用配置文件中的dbfilename和dir选项来使得主服务器可以执行BGSAVE操作来生成快照；使用配置文件中的slaveof选项使得Redis服务器设置为从服务器。</p>
+<ul>
+<li>无论是初次连接还是重新连接， 当建立一个从服务器时， 从服务器都将向主服务器发送一个 <a href="http://redisdoc.com/server/sync.html#sync" target="_blank" rel="noopener">SYNC</a> 命令。</li>
+<li>主服务器开始执行BGSAVE创建一个快照文件发送给从服务器，在这期间使用缓冲区记录所有的写命令</li>
+<li>从服务器收到快照文件，丢弃所有数据，载入快照文件</li>
+<li>主服务器在发送完快照文件之后开始向从服务器发送存储在缓冲区里面的写命令，之后主服务器每执行一个写命令就向从服务器发送相同的写命令。</li>
+</ul>
+<p>当添加多台从服务器时主服务器可能无法快速更新所有的从服务器，或者因为重新连接或者重新同步导致主服务器系统超载。从服务器也可以拥有自己的从服务器，通过从服务器更新数据到其他从服务器来解决问题（树状拓扑）。</p>
+<p>在Redis集群中，如果不在主节点进行持久化操作，只在Redis从库开启持久化防止主节点重启数据集为空导致把从节点数据集都清空。</p>
+<p>主节点不但负责数据读写，还负责把写命令发送给从节点，写命令的发送给从节点的过程是异步完成的，所以主节点在处理完写命令之后直接返回客户端，并不等待把命令发送给从节点并且从节点完成写命令。所以主从节点的数据会有一定的延迟。</p>
+<h4 id="修复故障的主服务器"><a href="#修复故障的主服务器" class="headerlink" title="修复故障的主服务器"></a>修复故障的主服务器</h4><p>A主服务器挂掉，向B从服务器发送SAVE命令生成快照，然后在C服务器加载快照启动服务，然后命令B从服务器将C服务器作为主服务器。</p>
+<h2 id="Reids-内存淘汰机制"><a href="#Reids-内存淘汰机制" class="headerlink" title="Reids 内存淘汰机制"></a>Reids 内存淘汰机制</h2><h4 id="解决的问题："><a href="#解决的问题：" class="headerlink" title="解决的问题："></a>解决的问题：</h4><p>随着业务量增长，Redis里的数据越来越多，数据量超过了服务器物理内存，这时候可能应用还能正常运行，因为操作系统可能在硬盘中构建了虚拟内存，但是可能发生频繁swap，所以尽量不要有这种情况发生。<br>所以应该把Redis使用的内存设定一个阈值，超过这个阈值Redis内存淘汰功能开始工作。</p>
+<h4 id="内存淘汰机制"><a href="#内存淘汰机制" class="headerlink" title="内存淘汰机制"></a>内存淘汰机制</h4><p>我们可以通过配置redis.conf中的maxmemory这个值来开启内存淘汰功能，至于这个值有什么意义，我们可以通过了解内存淘汰的过程来理解它的意义：</p>
+<p>1、客户端发起了需要申请更多内存的命令（如set）。<br>2、Redis检查内存使用情况，如果已使用的内存大于maxmemory则开始根据用户配置的不同淘汰策略来淘汰内存（key），从而换取一定的内存。<br>3、如果上面都没问题，则这个命令执行成功。<br>4、maxmemory为0的时候表示我们对Redis的内存使用没有限制。</p>
+<h4 id="内存淘汰策略"><a href="#内存淘汰策略" class="headerlink" title="内存淘汰策略"></a>内存淘汰策略</h4><p>内存淘汰只是Redis提供的一个功能，为了更好地实现这个功能，必须为不同的应用场景提供不同的策略，内存淘汰策略讲的是为实现内存淘汰我们具体怎么做，要解决的问题包括淘汰键空间如何选择？在键空间中淘汰键如何选择？<br>Redis提供了下面几种淘汰策略供用户选择，其中默认的策略为noeviction策略：</p>
+<ul>
+<li>noeviction：当内存使用达到阈值的时候，所有引起申请内存的命令会报错。</li>
+<li>allkeys-lru：在主键空间中，优先移除最近未使用的key。</li>
+<li>volatile-lru：在设置了过期时间的键空间中，优先移除最近未使用的key。</li>
+<li>allkeys-random：在主键空间中，随机移除某个key。</li>
+<li>volatile-random：在设置了过期时间的键空间中，随机移除某个key。</li>
+<li>volatile-ttl：在设置了过期时间的键空间中，具有更早过期时间的key优先移除。<br>这里补充一下主键空间和设置了过期时间的键空间，举个例子，假设我们有一批键存储在Redis中，则有那么一个哈希表用于存储这批键及其值，如果这批键中有一部分设置了过期时间，那么这批键还会被存储到另外一个哈希表中，这个哈希表中的值对应的是键被设置的过期时间。设置了过期时间的键空间为主键空间的子集。</li>
+</ul>
+<h4 id="如何选择淘汰策略"><a href="#如何选择淘汰策略" class="headerlink" title="如何选择淘汰策略"></a>如何选择淘汰策略</h4><p>我们了解了Redis大概提供了这么几种淘汰策略，那么如何选择呢？淘汰策略的选择可以通过下面的配置指定：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># maxmemory-policy noeviction</span></span><br></pre></td></tr></table></figure>
+<p>但是这个值填什么呢？为解决这个问题，我们需要了解我们的应用请求对于Redis中存储的数据集的访问方式以及我们的诉求是什么。同时Redis也支持Runtime修改淘汰策略，这使得我们不需要重启Redis实例而实时的调整内存淘汰策略。</p>
+<p>下面看看几种策略的适用场景：</p>
+<ul>
+<li>allkeys-lru：如果我们的应用对缓存的访问符合幂律分布（也就是存在相对热点数据），或者我们不太清楚我们应用的缓存访问分布状况，我们可以选择allkeys-lru策略。</li>
+<li>allkeys-random：如果我们的应用对于缓存key的访问概率相等，则可以使用这个策略。</li>
+<li>volatile-ttl：这种策略使得我们可以向Redis提示哪些key更适合被eviction。<br>另外，volatile-lru策略和volatile-random策略适合我们将一个Redis实例既应用于缓存和又应用于持久化存储的时候，然而我们也可以通过使用两个Redis实例来达到相同的效果，值得一提的是将key设置过期时间实际上会消耗更多的内存，因此我们建议使用allkeys-lru策略从而更有效率的使用内存。</li>
+</ul>
+<h4 id="非精准的LRU-Least-Recently-Used"><a href="#非精准的LRU-Least-Recently-Used" class="headerlink" title="非精准的LRU Least Recently Used"></a>非精准的LRU Least Recently Used</h4><p>上面提到的LRU（Least Recently Used）策略，实际上Redis实现的LRU并不是可靠的LRU，也就是名义上我们使用LRU算法淘汰键，但是实际上被淘汰的键并不一定是真正的最久没用的，这里涉及到一个权衡的问题，如果需要在全部键空间内搜索最优解，则必然会增加系统的开销，Redis是单线程的，也就是同一个实例在每一个时刻只能服务于一个客户端，所以耗时的操作一定要谨慎。为了在一定成本内实现相对的LRU，早期的Redis版本是基于采样的LRU，也就是放弃全部键空间内搜索解改为采样空间搜索最优解。自从Redis3.0版本之后，Redis作者对于基于采样的LRU进行了一些优化，目的是在一定的成本内让结果更靠近真实的LRU。</p>
+<h4 id="Redis如何清除过期keys："><a href="#Redis如何清除过期keys：" class="headerlink" title="Redis如何清除过期keys："></a>Redis如何清除过期keys：</h4><p>redis有两种方式清除过期keys：主动方式，和被动方式。</p>
+<ol>
+<li><p>主动方式：当client访问某一个key，redis会check key是否过期，如果已经过期，则被删除。</p>
+</li>
+<li><p>被动方式：不是所有的key都能被client访问。redis有一套默认的机制，redis每秒会进行10次以下动作:</p>
+<p>a、随机从keys中挑选100个key。</p>
+<p>b、删除已经过期的key。</p>
+<p>c、如果删除的key超过25个，那么重复步骤a。</p>
+<p>这是一个不是很严格的算法。不过可以基本保证过期的keys小于总数的25%。其实这是一种近似算法。随机选数，检查并删除。随机选key就保证了大致概率，结果只能是近似的。<br>这意味着：在任意时间点，那些占用内存并已经过期的keys的数量最多等于每秒写入数量的四分之一。</p>
+</li>
+</ol>
+<h2 id="Redis-发布与订阅（消息队列）"><a href="#Redis-发布与订阅（消息队列）" class="headerlink" title="Redis 发布与订阅（消息队列）"></a>Redis 发布与订阅（消息队列）</h2><p>发送者publisher负责向频道发送消息，频道的所有订阅者listener收到消息。</p>
+<h2 id="Redis-注意"><a href="#Redis-注意" class="headerlink" title="Redis 注意"></a>Redis 注意</h2><h5 id="Redis-击穿"><a href="#Redis-击穿" class="headerlink" title="Redis 击穿"></a>Redis 击穿</h5><p>缓存在某个时间点过期的时候，恰好在这个时间点对这个Key有大量的并发请求过来，这些请求发现缓存过期一般都会从后端DB加载数据并回设到缓存，这个时候大并发的请求可能会瞬间把后端DB压垮。</p>
+<p>如何解决：业界比较常用的做法，是使用mutex。简单地来说，就是在缓存失效的时候（判断拿出来的值为空），不是立即去load db，而是先使用缓存工具的某些带成功操作返回值的操作（比如Redis的SETNX或者Memcache的ADD）去set一个mutex key，当操作返回成功时，再进行load db的操作并回设缓存；否则，就重试整个get缓存的方法。类似下面的代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SETNX key value</span><br><span class="line">将 key 的值设为 value ，当且仅当 key 不存在。</span><br><span class="line">若给定的 key 已经存在，则 SETNX 不做任何动作。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">def get_key(key):</span><br><span class="line">    value = redis.get(key)</span><br><span class="line">    if not value:  # 如果缓存过期而被清空</span><br><span class="line">        if redis.setnx(key_mutex, &apos;value&apos;, 3*60):  # 设置3min的超时，防止del操作失败的时候，下次缓存过期一直不能load db</span><br><span class="line">            value = db.get(key)</span><br><span class="line">            redis.set(key, value, expire)</span><br><span class="line">            redis.del(key_mutex)</span><br><span class="line">        else:  # 这个时候代表同时候的其他线程已经load db并回设到缓存了，这时候重试获取缓存值即可</span><br><span class="line">            sleep(50)</span><br><span class="line">            get(key)</span><br><span class="line">    else:</span><br><span class="line">        return value</span><br></pre></td></tr></table></figure>
+<h3 id="Redis-关闭"><a href="#Redis-关闭" class="headerlink" title="Redis 关闭"></a>Redis 关闭</h3><p>可是使用shutdown命令或者kill 进程号关闭Redis，但是不能粗暴的使用kill -9 强制杀死Redis服务，不但不会做持久化操作，还会造成缓冲区资源不能被优雅关闭。</p>
+<h3 id="Redis-数据库与多核"><a href="#Redis-数据库与多核" class="headerlink" title="Redis 数据库与多核"></a>Redis 数据库与多核</h3><p>Redis一个实例多数据库使用时因为是在一个线程中可能会导致性能问题，多个Redis实例对应多个数据库能充分利用多核cpu。</p>
+<h2 id="Redis-配置"><a href="#Redis-配置" class="headerlink" title="Redis 配置"></a>Redis 配置</h2><ol>
+<li>redis run as a daemon</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">daemonize yes</span><br></pre></td></tr></table></figure>
+<ol>
+<li>默认 port： 6379， 默认绑定ip： 127.0.0.1</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">port 6379</span><br><span class="line">bind 127.0.0.1</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>Redis 最大连接数</p>
+<p>Redis提供了maxclients参数来限制最大客户端连接数，一旦连接数超过了maxclients，新的连接被拒绝。如果客户端使用不当不主动关闭连接，可能存在大量的idle连接，因此Redis提供了timeout参数来限制连接的最大空闲时间。</p>
+</li>
+</ol>
+<p>END</p>
+
+        
+      </div>
+      
+      
+      
+    </div>
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="http://p2jr9rg1a.bkt.clouddn.com/IMG_5505.jpg"
+                alt="Huang Bo" />
+            
+              <p class="site-author-name" itemprop="name">Huang Bo</p>
+              <p class="site-description motion-element" itemprop="description">Python</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huangbo" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:huangbo1990@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-单线程架构"><span class="nav-number">1.</span> <span class="nav-text">Redis 单线程架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-高性能"><span class="nav-number">1.1.</span> <span class="nav-text">Redis 高性能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-单线程阻塞"><span class="nav-number">1.2.</span> <span class="nav-text">Redis 单线程阻塞</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis"><span class="nav-number">2.</span> <span class="nav-text">Redis</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-类型"><span class="nav-number">3.</span> <span class="nav-text">Redis 类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-string"><span class="nav-number">3.1.</span> <span class="nav-text">Redis - string</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-List"><span class="nav-number">3.2.</span> <span class="nav-text">Redis List</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-Hashes"><span class="nav-number">3.3.</span> <span class="nav-text">Redis Hashes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-Sets"><span class="nav-number">3.4.</span> <span class="nav-text">Redis Sets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-Sorted-Sets"><span class="nav-number">3.5.</span> <span class="nav-text">Redis Sorted Sets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bitmaps"><span class="nav-number">3.6.</span> <span class="nav-text">Bitmaps</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HypeLogLogs"><span class="nav-number">3.7.</span> <span class="nav-text">HypeLogLogs</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-事务："><span class="nav-number">4.</span> <span class="nav-text">Redis 事务：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原子性（Atomicity）"><span class="nav-number">4.1.</span> <span class="nav-text">原子性（Atomicity）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-事务"><span class="nav-number">4.2.</span> <span class="nav-text">Redis 事务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis-并发"><span class="nav-number">4.2.1.</span> <span class="nav-text">Redis 并发</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用WATCH事务处理-（乐观锁）"><span class="nav-number">4.2.2.</span> <span class="nav-text">使用WATCH事务处理 （乐观锁）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-持久化"><span class="nav-number">5.</span> <span class="nav-text">Redis 持久化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-主从复制"><span class="nav-number">6.</span> <span class="nav-text">Redis 主从复制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#修复故障的主服务器"><span class="nav-number">6.0.1.</span> <span class="nav-text">修复故障的主服务器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reids-内存淘汰机制"><span class="nav-number">7.</span> <span class="nav-text">Reids 内存淘汰机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#解决的问题："><span class="nav-number">7.0.1.</span> <span class="nav-text">解决的问题：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内存淘汰机制"><span class="nav-number">7.0.2.</span> <span class="nav-text">内存淘汰机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#内存淘汰策略"><span class="nav-number">7.0.3.</span> <span class="nav-text">内存淘汰策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何选择淘汰策略"><span class="nav-number">7.0.4.</span> <span class="nav-text">如何选择淘汰策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#非精准的LRU-Least-Recently-Used"><span class="nav-number">7.0.5.</span> <span class="nav-text">非精准的LRU Least Recently Used</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis如何清除过期keys："><span class="nav-number">7.0.6.</span> <span class="nav-text">Redis如何清除过期keys：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-发布与订阅（消息队列）"><span class="nav-number">8.</span> <span class="nav-text">Redis 发布与订阅（消息队列）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-注意"><span class="nav-number">9.</span> <span class="nav-text">Redis 注意</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Redis-击穿"><span class="nav-number">9.0.0.1.</span> <span class="nav-text">Redis 击穿</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-关闭"><span class="nav-number">9.1.</span> <span class="nav-text">Redis 关闭</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-数据库与多核"><span class="nav-number">9.2.</span> <span class="nav-text">Redis 数据库与多核</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-配置"><span class="nav-number">10.</span> <span class="nav-text">Redis 配置</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+    Total <span id="busuanzi_value_site_pv"></span> Visitors 
+</span>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Huang Bo</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VWv4dATYRJSD1paiTW71IXCx-gzGzoHsz", "c1mvOVeqj9ScSoF2FxWpyItp");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>
