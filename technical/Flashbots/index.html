@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content=",">
+  <meta name="keywords" content="区块链,">
 
 
 
@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="Celery 介绍： Celery 是用Python编写，是一个专注于实时处理的任务队列 Celery通过Broker来发送和接收messages Data transferred between clients and workers needs to be serialized  Celery 问题apply_async定时任务，task被多次receive：1save_post.apply_">
-<meta name="keywords" content="Celery">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Celery">
-<meta property="og:url" content="http://yoursite.com/blog/technical/Celery.html">
+<meta name="description" content="MEVMEV 是在生成区块过程中通过重新排序交易、穿插或审查交易而提取的总价值。这主要通过对普通非技术用户在 Uniswap、Sushiswap 和其他 AMM DEX 中交易时进行抢先交易或三明治攻击实现。由于目前除了矿工外还有诸如套利机器人等在区块内的交易内寻找套利的机会。 Flashbots ProtectFlashbots Protect 由 API 和 RPC 组成，Flashbots">
+<meta name="keywords" content="区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flashbots 在解决MEV问题">
+<meta property="og:url" content="http://yoursite.com/technical/Flashbots/index.html">
 <meta property="og:site_name" content="Big Man`s Posts">
-<meta property="og:description" content="Celery 介绍： Celery 是用Python编写，是一个专注于实时处理的任务队列 Celery通过Broker来发送和接收messages Data transferred between clients and workers needs to be serialized  Celery 问题apply_async定时任务，task被多次receive：1save_post.apply_">
+<meta property="og:description" content="MEVMEV 是在生成区块过程中通过重新排序交易、穿插或审查交易而提取的总价值。这主要通过对普通非技术用户在 Uniswap、Sushiswap 和其他 AMM DEX 中交易时进行抢先交易或三明治攻击实现。由于目前除了矿工外还有诸如套利机器人等在区块内的交易内寻找套利的机会。 Flashbots ProtectFlashbots Protect 由 API 和 RPC 组成，Flashbots">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-03-07T15:11:47.605Z">
+<meta property="og:updated_time" content="2022-08-28T06:30:33.302Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Celery">
-<meta name="twitter:description" content="Celery 介绍： Celery 是用Python编写，是一个专注于实时处理的任务队列 Celery通过Broker来发送和接收messages Data transferred between clients and workers needs to be serialized  Celery 问题apply_async定时任务，task被多次receive：1save_post.apply_">
+<meta name="twitter:title" content="Flashbots 在解决MEV问题">
+<meta name="twitter:description" content="MEVMEV 是在生成区块过程中通过重新排序交易、穿插或审查交易而提取的总价值。这主要通过对普通非技术用户在 Uniswap、Sushiswap 和其他 AMM DEX 中交易时进行抢先交易或三明治攻击实现。由于目前除了矿工外还有诸如套利机器人等在区块内的交易内寻找套利的机会。 Flashbots ProtectFlashbots Protect 由 API 和 RPC 组成，Flashbots">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/blog/technical/Celery.html">
+  <link rel="canonical" href="http://yoursite.com/technical/Flashbots/">
 
 
 
 
 
-  <title>Celery | Big Man`s Posts</title>
+  <title>Flashbots 在解决MEV问题 | Big Man`s Posts</title>
   
 
 
@@ -231,50 +231,179 @@
 
   <div id="posts" class="posts-expand">
     
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/technical/Flashbots/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Huang Bo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/1613926?s=400&u=05017cc8b2d7b4b0c51d9ca74c8d28fec0b41d61&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Big Man`s Posts">
+    </span>
+
     
-    
-    <div class="post-block page">
       <header class="post-header">
 
-	<h1 class="post-title" itemprop="name headline">Celery</h1>
-
-
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
         
         
-          <h3 id="Celery-介绍："><a href="#Celery-介绍：" class="headerlink" title="Celery 介绍："></a>Celery 介绍：</h3><ul>
-<li>Celery 是用Python编写，是一个专注于实时处理的任务队列</li>
-<li>Celery通过Broker来发送和接收messages</li>
-<li>Data transferred between clients and workers needs to be serialized</li>
-</ul>
-<h3 id="Celery-问题"><a href="#Celery-问题" class="headerlink" title="Celery 问题"></a>Celery 问题</h3><h5 id="apply-async定时任务，task被多次receive："><a href="#apply-async定时任务，task被多次receive：" class="headerlink" title="apply_async定时任务，task被多次receive："></a>apply_async定时任务，task被多次receive：</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">save_post.apply_async(args=[request.POST, column_id, cur_task.id], kwargs=<span class="keyword">None</span>, eta=planed_datetime)</span><br></pre></td></tr></table></figure>
-<p>任务被多次执行</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BROKER_TRANSPORT_OPTIONS = &#123;<span class="string">'visibility_timeout'</span>: <span class="number">31104000</span>&#125;</span><br></pre></td></tr></table></figure>
-<p>The visibility timeout defines the number of seconds to wait for the worker to acknowledge the task before the message is redelivered to another worker</p>
-<h5 id="unacked-eta-任务重启之后不能重新received"><a href="#unacked-eta-任务重启之后不能重新received" class="headerlink" title="unacked eta 任务重启之后不能重新received"></a>unacked eta 任务重启之后不能重新received</h5><p>原因是celery运行在docker中，重启docker的时候直接</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker stop gbabyplus_gbbios_1</span><br></pre></td></tr></table></figure>
-<p>强行stop掉docker导致celery不是正常关闭，没有收尾工作，丢掉task<br>官方文档中说了：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kill -TERM ps_id</span><br></pre></td></tr></table></figure>
-<p>但是supervisorctl</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">supervisorctl stop gbpushcelery</span><br></pre></td></tr></table></figure>
-<p>也是正常关闭celery，所以stop之前先正常把celery关掉就好了。</p>
-<p>END</p>
-
+          <h1 class="post-title" itemprop="name headline">Flashbots 在解决MEV问题</h1>
         
-      </div>
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2022-08-28T14:30:33+08:00">
+                2022-08-28
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/区块链/" itemprop="url" rel="index">
+                    <span itemprop="name">区块链</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/technical/Flashbots/" class="leancloud_visitors" data-flag-title="Flashbots 在解决MEV问题">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
       
       
+
+      
+        <h5 id="MEV"><a href="#MEV" class="headerlink" title="MEV"></a>MEV</h5><p>MEV 是在生成区块过程中通过重新排序交易、穿插或审查交易而提取的总价值。这主要通过对普通非技术用户在 <strong>Uniswap</strong>、Sushiswap 和其他 AMM DEX 中交易时进行抢先交易或三明治攻击实现。由于目前除了矿工外还有诸如套利机器人等在区块内的交易内寻找套利的机会。</p>
+<h5 id="Flashbots-Protect"><a href="#Flashbots-Protect" class="headerlink" title="Flashbots Protect"></a>Flashbots Protect</h5><p>Flashbots Protect 由 API 和 RPC 组成，Flashbots Protect API 简化了创建、签名和提交捆绑交易等一系列复杂功能，让开发人员可以轻便地将其集成到应用中，让用户能将交易发送到 Flashbots 网络，Flashbots 将交易捆绑在一起有效隐藏了信息，直接发送给矿工而不是发送到公共内存池（mempool），防止交易被抢先交易或遭遇三明治攻击。</p>
+<p>当用户选择 Flashbots RPC 进行交易后，Flashbots 会验证这是否是一个有效的交易，先评估该交易是否需要抢先保护。Flashbots 维护了一个不需要抢先保护的列表例如简单的 ETH 转账或 ERC20 批准，这些交易会发送到公共内存池使交易批准更便宜，也可能更快。但如果需要进行保护将会发送给 Flashbots Protect API 来负责该交易的提交。</p>
+
       
     </div>
     
     
     
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/区块链/" rel="tag"># 区块链</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/technical/区块链分层结构/" rel="next" title="区块链分层结构">
+                <i class="fa fa-chevron-left"></i> 区块链分层结构
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
   </div>
 
 
@@ -405,7 +534,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Celery-介绍："><span class="nav-number">1.</span> <span class="nav-text">Celery 介绍：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Celery-问题"><span class="nav-number">2.</span> <span class="nav-text">Celery 问题</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#apply-async定时任务，task被多次receive："><span class="nav-number">2.0.1.</span> <span class="nav-text">apply_async定时任务，task被多次receive：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#unacked-eta-任务重启之后不能重新received"><span class="nav-number">2.0.2.</span> <span class="nav-text">unacked eta 任务重启之后不能重新received</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#MEV"><span class="nav-number">1.</span> <span class="nav-text">MEV</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Flashbots-Protect"><span class="nav-number">2.</span> <span class="nav-text">Flashbots Protect</span></a></li></ol></div>
             
 
           </div>
