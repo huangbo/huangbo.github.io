@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Django,MySQL,Redis,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="MySQL 连接对Django服务进行压测，DB报错数据库连接数过多，如果设置MySQL的最大连接数为1000，很快连接数就会达到上限，调整到2000，也很快连接数达到上限。 xuetangx DB最大连接数2048 1234567mysql&amp;gt; show variables like &amp;apos;max_connections&amp;apos;;+-----------------+-------">
+<meta name="keywords" content="Django,MySQL,Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django中Mysql Redis连接池">
+<meta property="og:url" content="http://yoursite.com/technical/Django中Mysql Redis连接池/index.html">
+<meta property="og:site_name" content="Big Man`s Posts">
+<meta property="og:description" content="MySQL 连接对Django服务进行压测，DB报错数据库连接数过多，如果设置MySQL的最大连接数为1000，很快连接数就会达到上限，调整到2000，也很快连接数达到上限。 xuetangx DB最大连接数2048 1234567mysql&amp;gt; show variables like &amp;apos;max_connections&amp;apos;;+-----------------+-------">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-03-07T15:11:43.027Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Django中Mysql Redis连接池">
+<meta name="twitter:description" content="MySQL 连接对Django服务进行压测，DB报错数据库连接数过多，如果设置MySQL的最大连接数为1000，很快连接数就会达到上限，调整到2000，也很快连接数达到上限。 xuetangx DB最大连接数2048 1234567mysql&amp;gt; show variables like &amp;apos;max_connections&amp;apos;;+-----------------+-------">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/technical/Django中Mysql Redis连接池/">
+
+
+
+
+
+  <title>Django中Mysql Redis连接池 | Big Man`s Posts</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Big Man`s Posts</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello World</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/technical/Django中Mysql Redis连接池/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Huang Bo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/1613926?s=400&u=05017cc8b2d7b4b0c51d9ca74c8d28fec0b41d61&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Big Man`s Posts">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Django中Mysql Redis连接池</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-07T23:11:43+08:00">
+                2018-03-07
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Django/" itemprop="url" rel="index">
+                    <span itemprop="name">Django</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/technical/Django中Mysql Redis连接池/" class="leancloud_visitors" data-flag-title="Django中Mysql Redis连接池">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="MySQL-连接"><a href="#MySQL-连接" class="headerlink" title="MySQL 连接"></a>MySQL 连接</h2><p>对Django服务进行压测，DB报错数据库连接数过多，如果设置MySQL的最大连接数为1000，很快连接数就会达到上限，调整到2000，也很快连接数达到上限。</p>
+<p>xuetangx DB最大连接数2048</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; show variables like &apos;max_connections&apos;;</span><br><span class="line">+-----------------+-------+</span><br><span class="line">| Variable_name   | Value |</span><br><span class="line">+-----------------+-------+</span><br><span class="line">| max_connections | 2048   |</span><br><span class="line">+-----------------+-------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+<p>通过Django文档可以发现Django其实提供了一个连接池的另一种时间方式</p>
+<h4 id="Django的默认数据库连接"><a href="#Django的默认数据库连接" class="headerlink" title="Django的默认数据库连接"></a>Django的默认数据库连接</h4><p>Django程序接受到请求之后，在第一次访问数据库的时候会创建一个数据库连接，直到请求结束，关闭数据库连接。（Django opens a connection to the database when it first makes a database query. It keeps this connection open and reuses it in subsequent requests.）下次请求也是如此。因此，这种情况下，随着访问的并发数越来越高，就会产生大量的数据库连接。也就是我们在压测时出现的情况。</p>
+<h4 id="使用CONN-MAX-AGE减少数据库请求（连接池）"><a href="#使用CONN-MAX-AGE减少数据库请求（连接池）" class="headerlink" title="使用CONN_MAX_AGE减少数据库请求（连接池）"></a>使用CONN_MAX_AGE减少数据库请求（连接池）</h4><p>每次请求都会创建新的数据库连接，这对于高并发的应用来说是不能接受的。因此在Django1.6时，提供了持久的数据库连接，通过DATABASE配置CONN_MAX_AGE来控制每个连接的最大存活时间。</p>
+<p>The default value is 0, preserving the historical behavior of closing the database connection at the end of each request. To enable persistent connections, set CONN_MAX_AGE to a positive number of seconds. For unlimited persistent connections, set it to None.</p>
+<p>这个参数的原理就是在每次创建完数据库连接之后，把连接放到一个Theard.local的实例中。在request请求开始结束的时候，打算关闭连接时会判断是否超过CONN_MAX_AGE设置这个有效期。超过则关闭。每次进行数据库请求的时候其实只是判断local中有没有已存在的连接，有则复用。</p>
+<p>基于上述原因，Django中对于CONN_MAX_AGE的使用是有些限制的，使用不当，会适得其反。因为保存的连接是基于线程局部变量的，因此如果你部署方式采用多线程，必须要注意保证你的最大线程数不会多余数据库能支持的最大连接数（一个线程一个连接）。另外，如果使用开发模式运行程序（直接runserver的方式），建议不要设置CONN_MAX_AGE，因为这种情况下，每次请求都会创建一个Thread。同时如果你设置了CONN_MAX_AGE，将会导致你创建大量的不可复用的持久的连接。</p>
+<h5 id="CONN-MAX-AGE设置"><a href="#CONN-MAX-AGE设置" class="headerlink" title="CONN_MAX_AGE设置"></a>CONN_MAX_AGE设置</h5><p>CONN_MAX_AGE的时间怎么设置主要取决于数据库对空闲连接的管理，比如你的MySQL设置了空闲1分钟就关闭连接，那你的CONN_MAX_AGE就不能大于一分钟，不过DBA已经习惯了程序中的线程池的概念，会在数据库中设置一个较大的值。</p>
+<h2 id="Redis-连接"><a href="#Redis-连接" class="headerlink" title="Redis 连接"></a>Redis 连接</h2><p>在做一个直播活动时，所有评论数据保存Redis，收到Redis服务报错：max number of clients reached</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis 127.0.0.1:6379&gt; CONFIG GET maxclients</span><br><span class="line">1) &quot;maxclients&quot;</span><br><span class="line">2) &quot;200&quot;</span><br></pre></td></tr></table></figure>
+<p>发现设置的这个最大连接数太小了，因为每次request都会创建redis连接，几百个人同时使用就达到最大上线了。</p>
+<p>Django-redis可以设置Redis连接池，并设置最大连接数，这样就能保证连接的复用和连接数的控制。</p>
+<p>the default connection pool is simple. You can only customize the maximum number of connections in the pool, by setting CONNECTION_POOL_KWARGS in the CACHES setting。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">CACHES = &#123;</span><br><span class="line">    &quot;default&quot;: &#123;</span><br><span class="line">        &quot;BACKEND&quot;: &quot;django_redis.cache.RedisCache&quot;,</span><br><span class="line">        ...</span><br><span class="line">        &quot;OPTIONS&quot;: &#123;</span><br><span class="line">            &quot;CONNECTION_POOL_KWARGS&quot;: &#123;&quot;max_connections&quot;: 100&#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>END</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Django/" rel="tag"># Django</a>
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+            <a href="/tags/Redis/" rel="tag"># Redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/technical/XEN FTX攻击/" rel="next" title="FTX 通过提币到攻击合约触发XEN的攻击">
+                <i class="fa fa-chevron-left"></i> FTX 通过提币到攻击合约触发XEN的攻击
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/technical/Django 前后端联调优化/" rel="prev" title="Django 前后端联调过程优化">
+                Django 前后端联调过程优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars.githubusercontent.com/u/1613926?s=400&u=05017cc8b2d7b4b0c51d9ca74c8d28fec0b41d61&v=4" alt="Huang Bo">
+            
+              <p class="site-author-name" itemprop="name">Huang Bo</p>
+              <p class="site-description motion-element" itemprop="description">Python Solidity MM</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huangbo" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:huangbo1990@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL-连接"><span class="nav-number">1.</span> <span class="nav-text">MySQL 连接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Django的默认数据库连接"><span class="nav-number">1.0.1.</span> <span class="nav-text">Django的默认数据库连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用CONN-MAX-AGE减少数据库请求（连接池）"><span class="nav-number">1.0.2.</span> <span class="nav-text">使用CONN_MAX_AGE减少数据库请求（连接池）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#CONN-MAX-AGE设置"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">CONN_MAX_AGE设置</span></a></li></ol></li></ol></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-连接"><span class="nav-number">2.</span> <span class="nav-text">Redis 连接</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+    Total <span id="busuanzi_value_site_pv"></span> Visitors 
+</span>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Huang Bo</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VWv4dATYRJSD1paiTW71IXCx-gzGzoHsz", "c1mvOVeqj9ScSoF2FxWpyItp");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

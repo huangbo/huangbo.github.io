@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content=",,,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="同源策略 浏览器有一个重要的概念-同源策略(Same Origin Policy)，所谓同源是指：域名、协议、端口相同。不同源的的客户端脚本（javascript）本在没有明确授权的情况下，不能读取对方的资源。但是允许执行对方的资源。如：A源的脚本不能读取B源的cookie，但是我们的脚本却都可以执行（或者说是加载调用）Google CDN提供的jQuery，以及其他CDN提供的js、css代码。">
+<meta name="keywords" content="Django,CORS,同源策略">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Django 同源策略场景">
+<meta property="og:url" content="http://yoursite.com/blog/technical/Django 同源策略场景.html">
+<meta property="og:site_name" content="Big Man`s Posts">
+<meta property="og:description" content="同源策略 浏览器有一个重要的概念-同源策略(Same Origin Policy)，所谓同源是指：域名、协议、端口相同。不同源的的客户端脚本（javascript）本在没有明确授权的情况下，不能读取对方的资源。但是允许执行对方的资源。如：A源的脚本不能读取B源的cookie，但是我们的脚本却都可以执行（或者说是加载调用）Google CDN提供的jQuery，以及其他CDN提供的js、css代码。">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-03-07T15:11:43.882Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Django 同源策略场景">
+<meta name="twitter:description" content="同源策略 浏览器有一个重要的概念-同源策略(Same Origin Policy)，所谓同源是指：域名、协议、端口相同。不同源的的客户端脚本（javascript）本在没有明确授权的情况下，不能读取对方的资源。但是允许执行对方的资源。如：A源的脚本不能读取B源的cookie，但是我们的脚本却都可以执行（或者说是加载调用）Google CDN提供的jQuery，以及其他CDN提供的js、css代码。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/blog/technical/Django 同源策略场景.html">
+
+
+
+
+
+  <title>Django 同源策略场景 | Big Man`s Posts</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Big Man`s Posts</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello World</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+	<h1 class="post-title" itemprop="name headline">Django 同源策略场景</h1>
+
+
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <h5 id="同源策略"><a href="#同源策略" class="headerlink" title="同源策略"></a>同源策略</h5><blockquote>
+<p>浏览器有一个重要的概念-同源策略(Same Origin Policy)，所谓同源是指：域名、协议、端口相同。不同源的的客户端脚本（javascript）本在没有明确授权的情况下，不能读取对方的资源。但是允许执行对方的资源。<br>如：A源的脚本不能读取B源的cookie，但是我们的脚本却都可以执行（或者说是加载调用）Google CDN提供的jQuery，以及其他CDN提供的js、css代码。</p>
+</blockquote>
+<p>举个例子：<br><a href="http://nginx.ubuntu.com:10014/backend/login.html" target="_blank" rel="noopener">http://nginx.ubuntu.com:10014/backend/login.html</a><br>在这个页面，然后输入用户名和密码之后，AJAX发送登录POST请求<a href="http://nginx.ubuntu.com:10014/v1.0/admin/access/" target="_blank" rel="noopener">http://nginx.ubuntu.com:10014/v1.0/admin/access/</a> ，验证成功后服务器设置cookie。<br>现在我在登录成功后的页面<a href="http://nginx.ubuntu.com:10014/backend/" target="_blank" rel="noopener">http://nginx.ubuntu.com:10014/backend/</a> <strong>AJAX请求</strong>不同源的资源（端口不同）<a href="http://nginx.ubuntu.com:10015/v1.0/admin/users/1/e789b4e938a0cfb3ce52bd3351abcd55/all/?page=1&amp;postPerPage=36" target="_blank" rel="noopener">http://nginx.ubuntu.com:10015/v1.0/admin/users/1/e789b4e938a0cfb3ce52bd3351abcd55/all/?page=1&amp;postPerPage=36</a><br>，此时由于同源策略，请求不会带上登录成功后设置的cookie，但是AJAX请求<a href="http://nginx.ubuntu.com:10014/v1.0/admin/users/1/e789b4e938a0cfb3ce52bd3351abcd55/all/?page=1&amp;postPerPage=36" target="_blank" rel="noopener">http://nginx.ubuntu.com:10014/v1.0/admin/users/1/e789b4e938a0cfb3ce52bd3351abcd55/all/?page=1&amp;postPerPage=36</a><br>会带上登录成功后设置的cookie。</p>
+<p>如果不是AJAX请求，而是在浏览器输入url或者postman中发起请求：<br><a href="http://nginx.ubuntu.com:10015/v1.0/admin/users/1/e789b4e938a0cfb3ce52bd3351abcd55/all/?page=1&amp;postPerPage=36" target="_blank" rel="noopener">http://nginx.ubuntu.com:10015/v1.0/admin/users/1/e789b4e938a0cfb3ce52bd3351abcd55/all/?page=1&amp;postPerPage=36</a><br>会发现带上了登录成功后设置的cookie。</p>
+<p>因为同源策略是约束的AJAX请求，不限制普通的请求（例如在浏览器输入url或者postman中发起请求）.<br>服务器可以设置访问到cookie的domain和path<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">response = Response(response_data, status=status.HTTP_200_OK)</span><br><span class="line">response[&apos;Access-Control-Allow-Origin&apos;] = &apos;nginx.ubuntu.com&apos;</span><br><span class="line">response.set_cookie(&apos;csrf_token&apos;, csrf_token,  domain=&quot;.ubuntu.com&quot;)</span><br><span class="line"></span><br><span class="line">settings.py</span><br><span class="line">SESSION_COOKIE_DOMAIN=&quot;.stackoverflow.com&quot;</span><br></pre></td></tr></table></figure></p>
+<p>所以说普通请求没有同源策略的限制但是有Domain和path限制</p>
+<h4 id="Django-解决跨域问题（django-cors-headers-）"><a href="#Django-解决跨域问题（django-cors-headers-）" class="headerlink" title="Django 解决跨域问题（django-cors-headers ）"></a>Django 解决跨域问题（django-cors-headers ）</h4><p>例如我在<a href="http://nginx.ubuntu.com:1122/backend/login.html" target="_blank" rel="noopener">http://nginx.ubuntu.com:1122/backend/login.html</a> 页面发送AJAX请求到<br><a href="http://nginx.ubuntu.com/v1.0/admin/access/0/0/" target="_blank" rel="noopener">http://nginx.ubuntu.com/v1.0/admin/access/0/0/</a> </p>
+<p>1、解决跨域请求的问题：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin:* 控制哪些域名可以访问该资源。</span><br><span class="line">可以设置</span><br><span class="line">CORS_ORIGIN_ALLOW_ALL = True</span><br></pre></td></tr></table></figure></p>
+<p>但是由于同源策略的限制，在AJAX请求<a href="http://nginx.ubuntu.com/v1.0/admin/access/0/0/" target="_blank" rel="noopener">http://nginx.ubuntu.com/v1.0/admin/access/0/0/</a> 验证用户名密码成功后，设置cookie，但是设置不成功（以上解决了跨域请求，但是同源策略还是会限制不同源ajax读取写入，需要CORS策略实现不同源的资源共享）<br>2、通过CORS 策略实现不同源资源共享，通过在ajax中设置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">    type : &apos;post&apos;,</span><br><span class="line">    url : url,</span><br><span class="line">    xhrFields: &#123;</span><br><span class="line">         withCredentials: true</span><br><span class="line">    &#125;,</span><br><span class="line">    data : &#123;</span><br><span class="line">        &apos;displayName&apos; : username,</span><br><span class="line">        &apos;password&apos; : password</span><br><span class="line">    &#125;,</span><br><span class="line">    success : function(data)&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>在AnjularJs中AJAX请求时设置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">GET:</span><br><span class="line">$http.get(allUrl, &#123;&apos;withCredentials&apos;:true&#125;).success(function(data)&#123;&#125;</span><br><span class="line"></span><br><span class="line">POST:</span><br><span class="line">var req = &#123;</span><br><span class="line">    method: &apos;POST&apos;,</span><br><span class="line">    url: &apos;http://example.com&apos;,</span><br><span class="line">    withCredentials:true</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$http(req).success(function()&#123;...&#125;).error(function()&#123;...&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>服务器端设置：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CORS_ORIGIN_ALLOW_ALL = True</span><br><span class="line">CORS_ALLOW_CREDENTIALS = True</span><br></pre></td></tr></table></figure></p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS#Requests_with_credentials" target="_blank" rel="noopener">https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS#Requests_with_credentials</a></p>
+<p>给一个带有withCredentials的请求发送响应的时候,服务器端必须指定允许请求的域名,不能使用’*‘.上面这个例子中,如果响应头是这样的:Access-Control-Allow-Origin: * ,则响应会失败. 在这个例子里,因为Access-Control-Allow-Origin的值是<a href="http://foo.example" target="_blank" rel="noopener">http://foo.example</a>  这个指定的请求域名，会成功</p>
+<h4 id="HTTPS给自己颁发CRT证书-出现的问题"><a href="#HTTPS给自己颁发CRT证书-出现的问题" class="headerlink" title="HTTPS给自己颁发CRT证书 出现的问题"></a>HTTPS给自己颁发CRT证书 出现的问题</h4><p>如果crt证书是自己颁发的，首次使用浏览器访问https资源会提示https证书有问题需要使用者授权才能继续访问，而经过认证机构认证的证书是可被信任的，不用使用者授权。<br>现在crt证书是自己颁发的， <a href="http://m.ubuntu.com/backend/login.html" target="_blank" rel="noopener">http://m.ubuntu.com/backend/login.html</a> 页面有一个ajax请求 <a href="https://nginx.ubuntu.com/v1.0/admin" target="_blank" rel="noopener">https://nginx.ubuntu.com/v1.0/admin</a> ，会发现请求根本没有发送出去。这是因为ajax请求前（https请求前）没有经过使用者授权，ajax也不会提示使用者进行授权，所以请求无法发送。 解决方法是先访问一个https的请求，例如<a href="https://m.ubuntu.com/backend/login.html" target="_blank" rel="noopener">https://m.ubuntu.com/backend/login.html</a> ，授权后重新进行以上操作就可以发出https请求。</p>
+<p>清除浏览器缓存（内容许可）后https请求需要重新授权（自己颁发的crt证书）</p>
+
+        
+      </div>
+      
+      
+      
+    </div>
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars.githubusercontent.com/u/1613926?s=400&u=05017cc8b2d7b4b0c51d9ca74c8d28fec0b41d61&v=4" alt="Huang Bo">
+            
+              <p class="site-author-name" itemprop="name">Huang Bo</p>
+              <p class="site-description motion-element" itemprop="description">Python Solidity MM</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huangbo" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:huangbo1990@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#同源策略"><span class="nav-number">1.</span> <span class="nav-text">同源策略</span></a></li></ol><li class="nav-item nav-level-4"><a class="nav-link" href="#Django-解决跨域问题（django-cors-headers-）"><span class="nav-number"></span> <span class="nav-text">Django 解决跨域问题（django-cors-headers ）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTPS给自己颁发CRT证书-出现的问题"><span class="nav-number"></span> <span class="nav-text">HTTPS给自己颁发CRT证书 出现的问题</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+    Total <span id="busuanzi_value_site_pv"></span> Visitors 
+</span>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Huang Bo</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VWv4dATYRJSD1paiTW71IXCx-gzGzoHsz", "c1mvOVeqj9ScSoF2FxWpyItp");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

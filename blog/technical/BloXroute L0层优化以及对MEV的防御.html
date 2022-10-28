@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content=",,,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="区块链的瓶颈比特币采用的 P2P 网络协议是 Gossip，而以太坊采用的是 Kademlia. 主要围绕流行病算法去同步各个节点的数据。即一个节点状态发生变化后便会开始向周边节点发送消息，收到信息的节点又会再次向周边节点发送消息直到所有节点收到消息。  这种传播方式非常去中心化，但是一个区块需要经过多个中间人才能到达所有其他节点，信息在区块链网络中节点间的每一次传输中都必须先经过验证，延迟比较长">
+<meta name="keywords" content="区块链">
+<meta property="og:type" content="website">
+<meta property="og:title" content="BloXroute L0层优化以及对MEV的防御">
+<meta property="og:url" content="http://yoursite.com/blog/technical/BloXroute L0层优化以及对MEV的防御.html">
+<meta property="og:site_name" content="Big Man`s Posts">
+<meta property="og:description" content="区块链的瓶颈比特币采用的 P2P 网络协议是 Gossip，而以太坊采用的是 Kademlia. 主要围绕流行病算法去同步各个节点的数据。即一个节点状态发生变化后便会开始向周边节点发送消息，收到信息的节点又会再次向周边节点发送消息直到所有节点收到消息。  这种传播方式非常去中心化，但是一个区块需要经过多个中间人才能到达所有其他节点，信息在区块链网络中节点间的每一次传输中都必须先经过验证，延迟比较长">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2022-08-26T09:39:23.534Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BloXroute L0层优化以及对MEV的防御">
+<meta name="twitter:description" content="区块链的瓶颈比特币采用的 P2P 网络协议是 Gossip，而以太坊采用的是 Kademlia. 主要围绕流行病算法去同步各个节点的数据。即一个节点状态发生变化后便会开始向周边节点发送消息，收到信息的节点又会再次向周边节点发送消息直到所有节点收到消息。  这种传播方式非常去中心化，但是一个区块需要经过多个中间人才能到达所有其他节点，信息在区块链网络中节点间的每一次传输中都必须先经过验证，延迟比较长">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/blog/technical/BloXroute L0层优化以及对MEV的防御.html">
+
+
+
+
+
+  <title>BloXroute L0层优化以及对MEV的防御 | Big Man`s Posts</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Big Man`s Posts</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello World</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+	<h1 class="post-title" itemprop="name headline">BloXroute L0层优化以及对MEV的防御</h1>
+
+
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <h3 id="区块链的瓶颈"><a href="#区块链的瓶颈" class="headerlink" title="区块链的瓶颈"></a>区块链的瓶颈</h3><p>比特币采用的 P2P 网络协议是 Gossip，而以太坊采用的是 Kademlia. 主要围绕流行病算法去同步各个节点的数据。即一个节点状态发生变化后便会开始向周边节点发送消息，收到信息的节点又会再次向周边节点发送消息直到所有节点收到消息。 </p>
+<p>这种传播方式非常去中心化，但是一个区块需要经过多个中间人才能到达所有其他节点，信息在区块链网络中节点间的每一次传输中都必须先经过验证，延迟比较长，全网达成共识需要较长长时间。</p>
+<p>虽然说增加区块大小或者减少出块的时间在现有的p2p网络下，会导致块的传播时间要大于了出块时间，极易产生分叉，分叉又会有分叉，可能导致区块链的崩溃。</p>
+<h3 id="bloXroute-简介"><a href="#bloXroute-简介" class="headerlink" title="bloXroute 简介"></a>bloXroute 简介</h3><p>基于L0层的一个网络传输的优化。 </p>
+<p>bloXroute 中文译为<strong>波思路</strong>，解决加密货币扩容瓶颈，提高区块的传播速度。</p>
+<p>它用于传播区块，降低区块数据的广播延迟。且对上层的区块链没有要求，任何区块链项目都可以结合它使用。波思路BDN是对等网络的补充，而不是替代。它架设在共识层的下方，通过加快数据传播来提升网络效率。</p>
+<h3 id="bloXroute-原理"><a href="#bloXroute-原理" class="headerlink" title="bloXroute 原理"></a>bloXroute 原理</h3><p>用户发送一笔交易，然后交易照常被广播到其他相邻节点，而其中一个节点为波思路网关，网关接着把交易转发到BDN进行快速广播，并由其他网关和区块链节点接收。</p>
+<p>区块链Layer 0扩容解决方案的关键技术</p>
+<h5 id="内部高速缓存技术"><a href="#内部高速缓存技术" class="headerlink" title="内部高速缓存技术"></a>内部高速缓存技术</h5><p>bloXroute将区块链节点信息同步的过程进行了简化</p>
+<p>首先，压缩数据</p>
+<p>BDN网关使用内部缓存技术把原来的交易生成4字节ID，把传播的长度缩小100倍，同时在BDN网关内部生成ID和交易数据的对照表，用来查询ID和交易的对应关系。然后进行数据传播</p>
+<p>第二步，当所有安装了BDN的区块链节点接收到新区块后，BDN网关会把短ID恢复成原来的交易从而完成“解压”。</p>
+<h5 id="直通路由技术"><a href="#直通路由技术" class="headerlink" title="直通路由技术"></a>直通路由技术</h5><p> 对于直通路由技术的应用，传统对等网络上的数据传输采用的是存储和转发的方式，以比特币为例，传统对等网络里每个区块链节点都是去信任的，因此必须重复同样的接收和验证动作后才把内容推给其他相邻节点，这样的方式虽然安全但非常低效。BDN中继节点都是bloXroute自营的，所以BDN内部的传输过程中节点间不需要验证的动作，节点只需要专注于内容分发，这为直通路由技术的运用创造了前提。</p>
+<h4 id="如何中心化的BDN保证中立性"><a href="#如何中心化的BDN保证中立性" class="headerlink" title="如何中心化的BDN保证中立性"></a>如何中心化的BDN保证中立性</h4><p>一个可验证的中立区块链分发网络</p>
+<p>在bloXroute的BDN上有两种节点，一种是中继节点由团队负责运营，另一种是区块链节点，是区块链网络本身的组成部分。保证BDN中继节点的中立性是bloXroute项目的核心，解决中心化网络的高效性和去中心化网络的安全性之间的矛盾。</p>
+<ul>
+<li><p>bloXroute网络运营商不能对区块链节点进行干预以及窃取区块包含的交易内容</p>
+<p>区块链节点在向BDN网关上传区块的时候，在进入BDN前网关对区块进行加密，这样该区块在BDN的传播过程中bloXroute是无法看到其中内容的，这样有效防止了bloXroute在信息传播中窃取信息。当该区块到达所有同样使用了BDN的其他区块链节点后，接收节点会向发出节点发出信号，表示自己已经收到了区块。然后发出区块的节点才会向接收节点发送私钥，拿到私钥后接收节点的BDN网关方可解压区块，将区块中的信息恢复成原始交易数据。这个时候，由于区块已经离开了BDN，作为BDN的运营者，bloXroute自然也无从知晓解压后区块内包含的交易信息。</p>
+</li>
+<li><p>某个区块链节点担心bloXroute有能力对节点进行干预或进行操作歧视，首先可以选择从对等网络（Peer Network）中的一个节点传递信息 ，然后转播传递给 BloXroute，从而达到隐藏出块节点地址的目的，这样一来确保bloXroute无法阻止任何区块节点对BDN的使用。</p>
+</li>
+<li><p>另外，bloXroute也发明了一套帮助区块链节点主动监督BDN的方法，它叫做测试区块。他们可以在安装BDN网关后向BDN上传测试区块，通过区块的传播效率来判断BDN的状态以及自身是否遭到不公对待。</p>
+</li>
+</ul>
+<h3 id="bloXroute-使用场景"><a href="#bloXroute-使用场景" class="headerlink" title="bloXroute  使用场景"></a>bloXroute  使用场景</h3><p>加速转账广播速度更快被矿工发现并且打包，转账广播更早的到达矿工，增加被打包到下一区块的概率</p>
+<p>矿工打包完区块更快的广播到其他节点被，只要先达到51%确认</p>
+<p>更早的接受到转账信息，获取交易情报</p>
+<p>夹子机器人</p>
+<h3 id="盈利模式"><a href="#盈利模式" class="headerlink" title="盈利模式"></a>盈利模式</h3><p>bloXroute会针对超出部分的交易向交易发起方额外收取挖矿费10%的交易加速费。听起来用户的交易成本好像是增加了，但实际上却是降低了。挖矿费金额是由供需关系决定的，供不应求时挖矿费会提高，相反则会降低。</p>
+<h3 id="bloXroute-接入"><a href="#bloXroute-接入" class="headerlink" title="bloXroute 接入"></a>bloXroute 接入</h3><p>中心网关：包括矿工在内的节点都连接到 bloXroute 的网关服务器，区块和交易通过这个网关进行广播。节点在运行区块链客户端的同时，还运行一个 bloXroute 的客户端，以连接到 bloXroute 网关。</p>
+<p>BloXroute 从底层通信层提高了区块链节点之间互相沟通的效率，而不是依靠改变共识算法或者链上或链下的扩容。因此，所有的现有区块链都可以使用这个分布网络来提高他们的吞吐量，对于他们 layer1 或 layer2 层不矛盾且对其扩容方案有着推力作用。</p>
+<p>首先，为了防止 BND 对子节点所传播的区块信息有偏见性，所有的的区块信息（例如钱包信息，地址等）在被传播之前都会经过加密处理，甚至会改变区块的大小，交易数量和大小总和。</p>
+<p>然后为了确保 BloXroute 不对子节点有偏见性，子节点通过一个间接的桥接网络进行广播，即节点并不直接传递区块信息给 BloXroute，首先会在对等网络（Peer Network）中传递信息 ，然后转播传递给 BloXroute。<br>在这样的系统中，很显然存在一个弊端，就是 BloXroute 可以阻止或者拦截子节点所发送的区块信息。为了避免这样的现象发生， 所有的子节点可以直接的向 BloXroute 发送一个测试用的加密区块，计算测试区块到达对等节点的所需时间，来随时监视 bloxXroute 的服务。</p>
+<p>虽然子节点发送无效的测试区块所实现的监控行为，看似会造成资源的浪费，但是随着节点数呈现指数型的增加，来完成测试的区块所需的带宽虽然增加了，而实现更高 TPS 的所需带宽则没有发生变化。这也解释了，为何当所参与的节点越多时，BloXroute 会效率更高，形成一个良性循环。</p>
+<p>整个系统可行性的关键性因素在于对等网络节点对 BloXroute 的审查机制， BloXroute 或者对等网络节点合谋者可以中继其区块信息到对等节点上而不是整个对等网络中，为了避免这样的情况，对等网络节点并不知道所有向他们发送信息的子节点，包括一半直接所接的子节点。这样的情况下，合谋者就无法分析哪个节点是直接所接，哪个不是，从而无法作恶。</p>
+<p>信息传播时间和数据大小成正比，为了避免传播延时导致的分叉问题，区块链一般通过限制区块大小把延时控制在合理的范围。另外，在传统的对等网络里，每个区块链节点在发起下一轮广播前要对接收的完整信息进行验证然后再把同样的信息重复广播给其相邻节点，这个重复的过程实际上造成了很多效率浪费。再有，对等网络节点间的数据传输路径缺乏优化，进一步加重了信息传播的延时问题。</p>
+<p>直通路由技术已被传统互联网行业广泛应用多年，其目的是提高数据传输的速率。在BDN里，当第一个数据包通过BDN网关抵达中继节点后，这个中继节点就立刻向外分发，而不必等到集齐所有数据包后才开始，也就是说当对等网络里的区块链节点还在等相邻节点完成上一轮数据接收的时候，所有使用BDN的区块链节点已经在同步接收出块节点发出的数据包。通过这个技术，可以最大限度地提升信息传输的效率。</p>
+
+        
+      </div>
+      
+      
+      
+    </div>
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars.githubusercontent.com/u/1613926?s=400&u=05017cc8b2d7b4b0c51d9ca74c8d28fec0b41d61&v=4" alt="Huang Bo">
+            
+              <p class="site-author-name" itemprop="name">Huang Bo</p>
+              <p class="site-description motion-element" itemprop="description">Python Solidity MM</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huangbo" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:huangbo1990@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#区块链的瓶颈"><span class="nav-number">1.</span> <span class="nav-text">区块链的瓶颈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bloXroute-简介"><span class="nav-number">2.</span> <span class="nav-text">bloXroute 简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bloXroute-原理"><span class="nav-number">3.</span> <span class="nav-text">bloXroute 原理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#内部高速缓存技术"><span class="nav-number">3.0.1.</span> <span class="nav-text">内部高速缓存技术</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#直通路由技术"><span class="nav-number">3.0.2.</span> <span class="nav-text">直通路由技术</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何中心化的BDN保证中立性"><span class="nav-number">3.1.</span> <span class="nav-text">如何中心化的BDN保证中立性</span></a></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#bloXroute-使用场景"><span class="nav-number">4.</span> <span class="nav-text">bloXroute  使用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#盈利模式"><span class="nav-number">5.</span> <span class="nav-text">盈利模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bloXroute-接入"><span class="nav-number">6.</span> <span class="nav-text">bloXroute 接入</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+    Total <span id="busuanzi_value_site_pv"></span> Visitors 
+</span>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Huang Bo</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VWv4dATYRJSD1paiTW71IXCx-gzGzoHsz", "c1mvOVeqj9ScSoF2FxWpyItp");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

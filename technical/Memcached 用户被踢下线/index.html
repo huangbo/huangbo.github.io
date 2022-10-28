@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Memcached,Session,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Memcachedmemcached是多线程，非阻塞IO复用的网络模型，多线程模型可以发挥多核作用，但是引入了cache coherency和锁的问题，比如：memcached最常用的stats命令，实际memcached所有操作都要对这个全局变量加锁，进行技术等工作，带来了性能损耗。 Memcached 内存管理How Memory Gets Allocated For ItemsMemory">
+<meta name="keywords" content="Memcached,Session">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Memcached Session 用户被频繁踢下线">
+<meta property="og:url" content="http://yoursite.com/technical/Memcached 用户被踢下线/index.html">
+<meta property="og:site_name" content="Big Man`s Posts">
+<meta property="og:description" content="Memcachedmemcached是多线程，非阻塞IO复用的网络模型，多线程模型可以发挥多核作用，但是引入了cache coherency和锁的问题，比如：memcached最常用的stats命令，实际memcached所有操作都要对这个全局变量加锁，进行技术等工作，带来了性能损耗。 Memcached 内存管理How Memory Gets Allocated For ItemsMemory">
+<meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2018-03-07T15:11:40.097Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于Memcached Session 用户被频繁踢下线">
+<meta name="twitter:description" content="Memcachedmemcached是多线程，非阻塞IO复用的网络模型，多线程模型可以发挥多核作用，但是引入了cache coherency和锁的问题，比如：memcached最常用的stats命令，实际memcached所有操作都要对这个全局变量加锁，进行技术等工作，带来了性能损耗。 Memcached 内存管理How Memory Gets Allocated For ItemsMemory">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/technical/Memcached 用户被踢下线/">
+
+
+
+
+
+  <title>基于Memcached Session 用户被频繁踢下线 | Big Man`s Posts</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Big Man`s Posts</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Hello World</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/technical/Memcached 用户被踢下线/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Huang Bo">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars.githubusercontent.com/u/1613926?s=400&u=05017cc8b2d7b4b0c51d9ca74c8d28fec0b41d61&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Big Man`s Posts">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于Memcached Session 用户被频繁踢下线</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Post modified&#58;</span>
+              
+              <time title="Post modified" itemprop="dateModified" datetime="2018-03-07T23:11:40+08:00">
+                2018-03-07
+              </time>
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Memcached/" itemprop="url" rel="index">
+                    <span itemprop="name">Memcached</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/technical/Memcached 用户被踢下线/" class="leancloud_visitors" data-flag-title="基于Memcached Session 用户被频繁踢下线">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Visitors&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="Memcached"><a href="#Memcached" class="headerlink" title="Memcached"></a>Memcached</h3><p>memcached是多线程，非阻塞IO复用的网络模型，多线程模型可以发挥多核作用，但是引入了cache coherency和锁的问题，比如：memcached最常用的stats命令，实际memcached所有操作都要对这个全局变量加锁，进行技术等工作，带来了性能损耗。</p>
+<h3 id="Memcached-内存管理"><a href="#Memcached-内存管理" class="headerlink" title="Memcached 内存管理"></a>Memcached 内存管理</h3><h5 id="How-Memory-Gets-Allocated-For-Items"><a href="#How-Memory-Gets-Allocated-For-Items" class="headerlink" title="How Memory Gets Allocated For Items"></a>How Memory Gets Allocated For Items</h5><p>Memory assigned via the <code>-m</code> commandline argument to memcached is reserved for item data storage. The primary storage is broken up (by default) into 1 megabyte pages. Each <code>page</code> is then assigned into <code>slab classes</code> as necessary, then cut into chunks of a specific size for that <code>slab class</code>. 这个chunk到底分多大可以通过growth factor参数设置。</p>
+<p>Once a page is assigned to a class, it is <em>never</em> moved. If your access patterns end up putting 80% of your pages in class 3, there will be less memory available for class 4. The best way to think about this is that memcached is actually many smaller individaul caches. Each class has its own set of statistical counters, and its own LRU.</p>
+<p>Classes, sizes, and chunks are shown best by starting up memcached with <code>-vv</code>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ ./memcached -vv</span><br><span class="line">slab class   1: chunk size        80 perslab   13107</span><br><span class="line">slab class   2: chunk size       104 perslab   10082</span><br><span class="line">slab class   3: chunk size       136 perslab    7710</span><br><span class="line">slab class   4: chunk size       176 perslab    5957</span><br><span class="line">slab class   5: chunk size       224 perslab    4681</span><br><span class="line">slab class   6: chunk size       280 perslab    3744</span><br><span class="line">slab class   7: chunk size       352 perslab    2978</span><br><span class="line">slab class   8: chunk size       440 perslab    2383</span><br><span class="line">slab class   9: chunk size       552 perslab    1899</span><br><span class="line">slab class  10: chunk size       696 perslab    1506</span><br><span class="line">[...etc...]</span><br></pre></td></tr></table></figure>
+<p>In slab class 1, each chunk is 80 bytes, and each page can then contain 13,107 chunks (or items). This continues all the way up to 1 megabyte.</p>
+<p>When storing items, they are pushed into the slab class of the nearest fit. If your key + misc data + value is 50 bytes total, it will go into class 1, with an overhead loss of 30 bytes. If your data is 90 bytes total, it will go into class2, with an overhead of 14 bytes.</p>
+<p>You can adjust the slab classes with <code>-f</code> and inspect them in various ways, but those’re more advanced topics for when you need them. It’s best to be aware of the basics because they can bite you.</p>
+<p>Slab是一个内存块，它是memcached一次申请内存的最小单位。在启动memcached的时候一般会使用参数-m指定其可用内存，但是并不是在启动的那一刻所有的内存就全部分配出去了，只有在需要的时候才会去申请，而且每次申请一定是一个slab。Slab的大小固定为1M（1048576 Byte），一个slab由若干个大小相等的chunk组成。每个chunk中都保存了一个item结构体、一对key和value。</p>
+<h5 id="How-the-LRU-Decides-What-to-Evict"><a href="#How-the-LRU-Decides-What-to-Evict" class="headerlink" title="How the LRU Decides What to Evict"></a>How the LRU Decides What to Evict</h5><p>Memory is also reclaimed when it’s time to store a new item. If there are no free chunks, and no free pages in the appropriate slab class, memcached will look at the end of the LRU for an item to “reclaim”. It will search the last few items in the tail for one which has already been expired, and is thus free for reuse. If it cannot find an expired item however, it will “evict” one which has not yet expired. This is then noted in several statistical counters.</p>
+<h5 id="Memcached-LRU"><a href="#Memcached-LRU" class="headerlink" title="Memcached LRU"></a>Memcached LRU</h5><p>Memcached is LRU <em>per slab class</em>, each slab class is essentially a separate cache,  but not globally LRU.  the LRU question.  Memcached的LRU算法针对每个slab类执行，而不是针对整体。</p>
+<p><a href="https://github.com/memcached/memcached/wiki/UserInternals" target="_blank" rel="noopener">https://github.com/memcached/memcached/wiki/UserInternals</a></p>
+<h5 id="为什么不用Memcached存储session"><a href="#为什么不用Memcached存储session" class="headerlink" title="为什么不用Memcached存储session"></a>为什么不用Memcached存储session</h5><ul>
+<li>memcached不支持内存数据的持久化操作，所有的数据都以in-memory的形式存储，重启导致所有用户下线</li>
+<li>memcached的LRU内存管理机制可能会导致用户无缘无故地掉线。</li>
+</ul>
+<p>然而Redis支持持久化，支持全局LRU，good！！！！！！！</p>
+<p><a href="http://work.tinou.com/2011/04/memcached-for-dummies.html" target="_blank" rel="noopener">http://work.tinou.com/2011/04/memcached-for-dummies.html</a></p>
+<h5 id="主站用户莫名被登出，查看Memcached-stat"><a href="#主站用户莫名被登出，查看Memcached-stat" class="headerlink" title="主站用户莫名被登出，查看Memcached stat"></a>主站用户莫名被登出，查看Memcached stat</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">huangbo@myhost  ~  perl memcached-tool 10.0.0.173:11211 display</span><br><span class="line">  #  Item_Size  Max_age   Pages   Count   Full?  Evicted Evict_Time OOM</span><br><span class="line">  1      96B         0s       1       0      no        0        0    0</span><br><span class="line">  2     120B       194s       1       6      no        0        0    0</span><br><span class="line">  3     152B      2790s      17  117266      no 1696266753     2789    0</span><br><span class="line">  4     192B     32682s      78  425958     yes 234235979    32681    0</span><br><span class="line">  5     240B    131741s     796 3477724     yes 1129245382   131741    0</span><br><span class="line">  6     304B    100133s      78  269021      no 95225244   100132    0</span><br><span class="line">  7     384B    312127s      57  155610     yes  6362888   312110    0</span><br><span class="line">  8     480B    176880s      18   39312     yes  8055819   176879    0</span><br><span class="line">  9     600B    135364s      23   40181     yes  4471283   135357    0</span><br><span class="line"> 10     752B     77443s       3    4181      no   881926    77395    0</span><br><span class="line"> 11     944B    135866s       2    2217      no   240826   135491    0</span><br><span class="line"> 12     1.2K    295427s       4    3538      no   187950   295741    0</span><br><span class="line"> 13     1.4K    341232s       5    3539      no    98413   341815    0</span><br><span class="line"> 14     1.8K    222496s      13    7331      no   669574   222461    0</span><br><span class="line"> 15     2.3K    310674s       7    3155      no   209635   310673    0</span><br><span class="line"> 16     2.8K    238582s       3    1068      no    35549   241209    0</span><br><span class="line"> 17     3.5K    672512s       9    2587      no    42820   672166    0</span><br><span class="line"> 18     4.4K    229625s       9    2066      no    39325   230667    0</span><br><span class="line"> 19     5.5K     77584s       5     916      no     5992    76997    0</span><br><span class="line"> 20     6.9K     53109s       7     892      no     1824    64828    0</span><br><span class="line"> 21     8.7K     91854s      14    1611      no     1232   106838    0</span><br><span class="line"> 22    10.8K     29172s      16     866      no     1148    57062    0</span><br><span class="line"> 23    13.6K     43701s      23    1541      no     1141    47511    0</span><br><span class="line"> 24    16.9K     44423s      31    1792      no      934    43826    0</span><br><span class="line"> 25    21.2K      6213s      36     660      no      875    22028    0</span><br><span class="line"> 26    26.5K       303s      56      84      no      662    34282    0</span><br><span class="line"> 27    33.1K       951s      66     195      no      634    23367    0</span><br><span class="line"> 28    41.4K      3100s      75     427      no      466    32579    0</span><br><span class="line"> 29    51.7K      1311s      82     203      no      396    37311    0</span><br><span class="line"> 30    64.7K      8653s      81     703      no      254    37836    0</span><br><span class="line"> 31    80.9K      8398s      79     605      no      184    41105    0</span><br><span class="line"> 32   101.1K       297s      54     125      no      121     8442    0</span><br><span class="line"> 33   126.3K       301s      44     106      no      165     5217    0</span><br><span class="line"> 34   157.9K       303s      44     152      no     2472     2172    0</span><br><span class="line"> 35   197.4K       324s      40     168      no    40075      295    0</span><br><span class="line"> 36   246.8K       325s      38     149      no   276942      290    0</span><br><span class="line"> 37   308.5K       116s      20      60     yes  4724203      115    8</span><br><span class="line"> 38   385.6K       198s      29      58     yes   494660      200    0</span><br><span class="line"> 39   482.0K       177s      28      56     yes   290035      185    0</span><br><span class="line"> 40   602.5K       123s      38      38     yes  1322083      125   15</span><br><span class="line"> 41   753.1K       156s      45      44      no  1179257      158    1</span><br><span class="line"> 42  1024.0K        64s      36      36     yes  3099612       65  205</span><br></pre></td></tr></table></figure>
+<p><strong>Item_Size</strong> The amount of space each chunk uses. One item uses one chunk of the appropriate size.</p>
+<p><strong>Max_age</strong> Age of the oldest item in the LRU.</p>
+<p><strong>Pages</strong> Total number of pages allocated to the slab class.</p>
+<p><strong>Count</strong> Number of items presently stored in this class. Expired items are not automatically excluded.</p>
+<p><strong>Full?</strong> Yes if there are no free chunks at the end of the last allocated page.</p>
+<p><strong>Evicted</strong> Number of times an item had to be evicted from the LRU before it expired.</p>
+<p><strong>Evict_Time</strong> Seconds since the last access for the most recent item evicted from this class.</p>
+<p><strong>OOM</strong> Number of times the underlying slab class was unable to store a new item.</p>
+<p>可以看出有有许多slab已经不够用了，主站用户被LRU登出，可以增大Slab的默认值1M，因为Memcached并不是开始就把所有内存都分配出去，所以用的少的用不了那么多slab，用的多的slab不至于LRU那么频繁。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Memcached/" rel="tag"># Memcached</a>
+          
+            <a href="/tags/Session/" rel="tag"># Session</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/technical/Django 前后端联调优化/" rel="next" title="Django 前后端联调过程优化">
+                <i class="fa fa-chevron-left"></i> Django 前后端联调过程优化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/technical/Django服务单机器多服务Session问题/" rel="prev" title="Django服务单机器多服务Session问题">
+                Django服务单机器多服务Session问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars.githubusercontent.com/u/1613926?s=400&u=05017cc8b2d7b4b0c51d9ca74c8d28fec0b41d61&v=4" alt="Huang Bo">
+            
+              <p class="site-author-name" itemprop="name">Huang Bo</p>
+              <p class="site-description motion-element" itemprop="description">Python Solidity MM</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">15</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/huangbo" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:huangbo1990@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Memcached"><span class="nav-number">1.</span> <span class="nav-text">Memcached</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Memcached-内存管理"><span class="nav-number">2.</span> <span class="nav-text">Memcached 内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#How-Memory-Gets-Allocated-For-Items"><span class="nav-number">2.0.1.</span> <span class="nav-text">How Memory Gets Allocated For Items</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#How-the-LRU-Decides-What-to-Evict"><span class="nav-number">2.0.2.</span> <span class="nav-text">How the LRU Decides What to Evict</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Memcached-LRU"><span class="nav-number">2.0.3.</span> <span class="nav-text">Memcached LRU</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#为什么不用Memcached存储session"><span class="nav-number">2.0.4.</span> <span class="nav-text">为什么不用Memcached存储session</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#主站用户莫名被登出，查看Memcached-stat"><span class="nav-number">2.0.5.</span> <span class="nav-text">主站用户莫名被登出，查看Memcached stat</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+<span id="busuanzi_container_site_pv">
+    Total <span id="busuanzi_value_site_pv"></span> Visitors 
+</span>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Huang Bo</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("VWv4dATYRJSD1paiTW71IXCx-gzGzoHsz", "c1mvOVeqj9ScSoF2FxWpyItp");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>
